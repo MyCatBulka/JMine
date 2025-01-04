@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="BRULib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/BRULib.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
