@@ -2,12 +2,14 @@ package com.bulka.java.games.jmine.engine;
 
 
 import com.bulka.java.games.jmine.engine.io.InputManager;
+import com.bulka.java.games.jmine.engine.utils.GLUtils;
 import com.bulka.java.games.jmine.engine.window.Window;
 import com.bulka.java.games.jmine.game.Game;
 import com.bulka.java.games.jmine.launcher.Main;
 import com.bulka.java.games.jmine.localization.LocalizationManager;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -111,7 +113,14 @@ public class Engine {
                 logger.info("Exiting by system tray");
                 running = false;
             });
+            MenuItem hardExitMenuItem = new MenuItem("HARD EXIT (Don`t recommended)");
+            hardExitMenuItem.addActionListener(e -> {
+                logger.info("Hard exiting by system tray");
+                running = false;
+                exit(0);
+            });
             popupMenu.add(exitMenuItem);
+            popupMenu.add(hardExitMenuItem);
             trayIcon.setPopupMenu(popupMenu);
             tray.add(trayIcon);
 
@@ -124,6 +133,7 @@ public class Engine {
     }
 
     public void loop() {
+        int error;
         while (running) {
             preUpdate();
             update();
@@ -131,6 +141,12 @@ public class Engine {
             GLFW.glfwPollEvents();
             render();
             GLFW.glfwSwapBuffers(window.getWindow());
+
+            error = GL11.glGetError();
+            if(error != GL11.GL_NO_ERROR){
+                String errorMessage = GLUtils.getErrorMessage(error);
+                logger.severe("Got OpenGL error " + error + ": " + errorMessage);
+            }
             fpsCounter.frame();
         }
         exit(0);
