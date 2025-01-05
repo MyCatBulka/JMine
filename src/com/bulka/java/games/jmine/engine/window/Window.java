@@ -31,7 +31,8 @@ public class Window {
     private boolean fullScreenMode = false;
     private double aspect;
     private boolean v_sync = false;
-    private Vector3f background = new Vector3f(0.6f, 0.9f, 1);
+    private Vector3f background = new Vector3f(0.6f, 0.9f, 1.0f); //SKY
+//    private Vector3f background = new Vector3f(0.0f, 0.0f, 0.0f);
 
     public void init() {
         width = Engine.getEngine().getSettingsManager().getInt("window.width", 640);

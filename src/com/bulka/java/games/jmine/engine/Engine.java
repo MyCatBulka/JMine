@@ -1,6 +1,8 @@
 package com.bulka.java.games.jmine.engine;
 
 
+import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
+import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.engine.utils.GLUtils;
 import com.bulka.java.games.jmine.engine.window.Window;
@@ -23,10 +25,25 @@ public class Engine {
     private LocalizationManager localizationManager;
     private SettingsManager settingsManager;
     private Window window;
-    private boolean showCursor = true;
-    private FPSCounter fpsCounter;
     private Game game;
+    private BasicRenderer basicRenderer;
+    private ShaderManager shaderManager;
+
+    private boolean showCursor = true;
     private boolean running = false;
+
+    //FPS:
+    private long FPS;
+    private long FPSCounter;
+    private long FPSTime;
+    public static final int FPS_PERIOD = 500;
+    public static final int FPS_CHANGING_IN_SECONDS = 1000 / FPS_PERIOD;
+    private long timeFrameStart;
+    private double deltaTime;
+    private long timeUpdateStart;
+    private double updateTime;
+    private long timeRenderStart;
+    private double renderTime;
 
 
     public void start() {
@@ -74,7 +91,18 @@ public class Engine {
             game.init();
             logger.info("Initialized Game");
 
-            fpsCounter = new FPSCounter();
+            logger.info("Initializing ShaderManager and loading Shaders");
+            shaderManager = new ShaderManager();
+            shaderManager.load();
+            logger.info("Initialized ShaderManager and loaded Shaders");
+
+            logger.info("Initializing basic renderer");
+            basicRenderer = new BasicRenderer();
+            basicRenderer.init();
+            logger.info("Initialized basic renderer");
+
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
             logger.info("All is initialized");
 
@@ -135,19 +163,34 @@ public class Engine {
     public void loop() {
         int error;
         while (running) {
+            timeFrameStart = System.nanoTime();
+            timeUpdateStart = System.nanoTime();
             preUpdate();
             update();
             postUpdate();
             GLFW.glfwPollEvents();
+            updateTime = (double) (System.nanoTime() - timeUpdateStart) / 1_000_000_000;
+            timeRenderStart = System.nanoTime();
             render();
             GLFW.glfwSwapBuffers(window.getWindow());
+            renderTime = (double) (System.nanoTime() - timeRenderStart) / 1_000_000_000;
 
             error = GL11.glGetError();
-            if(error != GL11.GL_NO_ERROR){
+            if (error != GL11.GL_NO_ERROR) {
                 String errorMessage = GLUtils.getErrorMessage(error);
                 logger.severe("Got OpenGL error " + error + ": " + errorMessage);
             }
-            fpsCounter.frame();
+
+            deltaTime = (double) (System.nanoTime() - timeFrameStart) / 1_000_000_000;
+
+            FPSCounter++;
+            if (System.currentTimeMillis() - FPSTime >= FPS_PERIOD) {
+                FPS = FPSCounter * FPS_CHANGING_IN_SECONDS;
+                FPSTime = System.currentTimeMillis();
+                FPSCounter = 0;
+                window.setTitle(Engine.getEngine().getWindow().getBasicTitle() + "; FPS: " + FPS);
+//                System.out.println(String.format(Locale.US, "FPS: %d; deltaTime: %f; updateTime: %f; renderTime: %f", FPS, deltaTime, updateTime, renderTime));
+            }
         }
         exit(0);
     }
@@ -161,6 +204,7 @@ public class Engine {
         updateInput();
         window.update();
         game.update();
+        basicRenderer.update();
 
     }
 
@@ -174,6 +218,10 @@ public class Engine {
             logger.info("Changing full screen mode to " + fsm);
             window.setFullScreenMode(fsm);
         }
+        if (inputManager.isKeyTypedClicked(GLFW.GLFW_KEY_TAB)) {
+            showCursor = !showCursor;
+            window.setCursorMode(showCursor);
+        }
     }
 
     public void postUpdate() {
@@ -184,6 +232,7 @@ public class Engine {
     public void render() {
         window.clearBG();
         game.render();
+        basicRenderer.render();
     }
 
     public static Engine getEngine() {
@@ -200,6 +249,7 @@ public class Engine {
     }
 
     public void destroy() {
+        logger.info("Destroying");
         if (inputManager != null)
             inputManager.destroy();
         if (settingsManager != null)
@@ -208,6 +258,10 @@ public class Engine {
             localizationManager.destroy();
         if (game != null)
             game.destroy();
+        if (basicRenderer != null)
+            basicRenderer.destroy();
+        if (shaderManager != null)
+            shaderManager.destroy();
     }
 
     public InputManager getInputManager() {
@@ -236,5 +290,29 @@ public class Engine {
 
     public void setRunning(boolean running) {
         this.running = running;
+    }
+
+    public BasicRenderer getBasicRenderer() {
+        return basicRenderer;
+    }
+
+    public double getDeltaTime() {
+        return deltaTime;
+    }
+
+    public double getUpdateTime() {
+        return updateTime;
+    }
+
+    public double getRenderTime() {
+        return renderTime;
+    }
+
+    public long getFPS() {
+        return FPS;
+    }
+
+    public ShaderManager getShaderManager() {
+        return shaderManager;
     }
 }
