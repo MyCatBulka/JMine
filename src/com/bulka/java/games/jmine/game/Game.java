@@ -13,6 +13,7 @@ import com.bulka.java.games.jmine.game.contorls.Controls;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.awt.*;
 import java.util.logging.Logger;
 
 public class Game {
@@ -20,6 +21,7 @@ public class Game {
     private GameObject testGameObject;
     private Hero hero;
     private Controls controls;
+    private DevMenu devMenu;
 
 
     public Game() {
@@ -27,6 +29,11 @@ public class Game {
     }
 
     public void init(){
+        logger.info("Initializing DevMenu");
+        devMenu = new DevMenu();
+        devMenu.init();
+        logger.info("Initialized DevMenu");
+
         float size = 0.5f;
         testGameObject = new GameObject(new Mesh(new Vertex[]{
                 new Vertex(-size, -size, 0, 0.0f, 1.0f),
@@ -52,6 +59,7 @@ public class Game {
         controls.load();
         logger.info("Loaded contorls");
 
+
         logger.info("Initializing Hero");
         hero = new Hero(new Vector3f(0, 0, 5), new Vector3f(0, 0, 0));
         hero.init();
@@ -61,6 +69,7 @@ public class Game {
 
     public void postInit(){
         hero.postInit();
+        devMenu.postInit();
     }
 
     public void preUpdate(){
@@ -69,6 +78,7 @@ public class Game {
 
     public void update(){
         hero.update();
+        devMenu.update();
     }
 
     public void postUpdate(){
@@ -78,6 +88,7 @@ public class Game {
     public void render(){
         testGameObject.render();
         hero.render();
+        devMenu.render();
 //        BasicRenderer.renderMesh(testGameObject.getMesh(), testGameObject.getShader(), testGameObject.getMaterial(), null);
     }
 

@@ -53,7 +53,7 @@ public class GameObject {
 
     }
     public void render(){
-        BasicRenderer.renderMesh(mesh, shader, material, modelMatrix);
+        BasicRenderer.render(this);
     }
 
     public Mesh getMesh() {

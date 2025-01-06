@@ -24,6 +24,8 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl/lwjgl-openal-natives-windows.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl/lwjgl-opengl-natives-windows.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl/lwjgl-freetype-natives-windows.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl/lwjgl-nanovg-javadoc.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/lwjgl/lwjgl-nanovg-natives-windows.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

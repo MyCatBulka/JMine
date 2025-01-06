@@ -116,7 +116,7 @@ public class Window {
 
     public void clearBG(){
         GL11.glClearColor(background.x, background.y, background.z, 1);
-        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
     }
 
     public boolean windowShouldClose() {
@@ -292,5 +292,9 @@ public class Window {
 
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
+    }
+
+    public void destroy() {
+        GLFW.glfwDestroyWindow(window);
     }
 }

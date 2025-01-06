@@ -12,7 +12,6 @@ public class Hero {
     private Camera camera;
     private float speed = 10f;
     private float verticalSpeed = 10f;
-    private float rotSpeed = 0.2f;
 
     public Hero() {
 
@@ -46,11 +45,11 @@ public class Hero {
 
         if(Engine.getEngine().getInputManager().isInWindow() && !Engine.getEngine().isShowCursor()) {
             if (Engine.getEngine().getInputManager().getMouseMovementX() != 0) {
-                addRotation(0, (float) Engine.getEngine().getInputManager().getMouseMovementX() * rotSpeed, 0);
+                addRotation(0, (float) Engine.getEngine().getInputManager().getMouseMovementX() * Engine.getEngine().getGame().getControls().mouseSensitivity, 0);
                 changed = true;
             }
             if (Engine.getEngine().getInputManager().getMouseMovementY() != 0) {
-                addRotation((float) Engine.getEngine().getInputManager().getMouseMovementY() * rotSpeed, 0, 0);
+                addRotation((float) Engine.getEngine().getInputManager().getMouseMovementY() * Engine.getEngine().getGame().getControls().mouseSensitivity, 0, 0);
                 changed = true;
             }
         }

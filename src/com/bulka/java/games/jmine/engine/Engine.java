@@ -3,6 +3,7 @@ package com.bulka.java.games.jmine.engine;
 
 import com.bulka.java.games.jmine.engine.graphics.material.Texture;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
+import com.bulka.java.games.jmine.engine.graphics.render.TextRenderer;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.engine.utils.GLUtils;
@@ -11,7 +12,10 @@ import com.bulka.java.games.jmine.game.Game;
 import com.bulka.java.games.jmine.launcher.Main;
 import com.bulka.java.games.jmine.localization.LocalizationManager;
 import com.bulka.java.games.jmine.settings.SettingsManager;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.nanovg.NanoVG;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
@@ -22,6 +26,8 @@ import java.util.logging.Logger;
 
 public class Engine {
     private Logger logger = Logger.getLogger(this.getClass().getName());
+
+    public static final String VERSION = "0.0.1a";
     private InputManager inputManager;
     private LocalizationManager localizationManager;
     private SettingsManager settingsManager;
@@ -29,6 +35,7 @@ public class Engine {
     private Game game;
     private BasicRenderer basicRenderer;
     private ShaderManager shaderManager;
+    private TextRenderer textRenderer;
 
     private boolean showCursor = true;
     private boolean running = false;
@@ -45,6 +52,7 @@ public class Engine {
     private double updateTime;
     private long timeRenderStart;
     private double renderTime;
+
 
 
     public void start() {
@@ -101,13 +109,20 @@ public class Engine {
             logger.info("Initialized Game");
 
 
-
             logger.info("Initializing basic renderer");
             basicRenderer = new BasicRenderer();
             basicRenderer.init();
             logger.info("Initialized basic renderer");
 
+            logger.info("Initializing text renderer");
+            textRenderer = new TextRenderer();
+            textRenderer.load();
+            logger.info("Initialized text renderer");
+
+
             GL11.glEnable(GL11.GL_CULL_FACE);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glEnable(GL11.GL_STENCIL_TEST);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -175,7 +190,6 @@ public class Engine {
     }
 
     public void loop() {
-        int error;
         while (running) {
             timeFrameStart = System.nanoTime();
             timeUpdateStart = System.nanoTime();
@@ -188,10 +202,12 @@ public class Engine {
             render();
             GLFW.glfwSwapBuffers(window.getWindow());
             renderTime = (double) (System.nanoTime() - timeRenderStart) / 1_000_000_000;
+            printErrorsGL();
+
+            FPSCounter++;
 
             deltaTime = (double) (System.nanoTime() - timeFrameStart) / 1_000_000_000;
 
-            FPSCounter++;
             if (System.currentTimeMillis() - FPSTime >= FPS_PERIOD) {
                 FPS = FPSCounter * FPS_CHANGING_IN_SECONDS;
                 FPSTime = System.currentTimeMillis();
@@ -255,8 +271,11 @@ public class Engine {
 
     public void render() {
         window.clearBG();
+
+        NanoVG.nvgBeginFrame(textRenderer.getVg(), window.getWidth(), window.getHeight(), 1.0f);
         game.render();
         basicRenderer.render();
+        NanoVG.nvgEndFrame(textRenderer.getVg());
     }
 
     public static Engine getEngine() {
@@ -274,6 +293,8 @@ public class Engine {
 
     public void destroy() {
         logger.info("Destroying");
+        if(window != null)
+            window.destroy();
         if (inputManager != null)
             inputManager.destroy();
         if (settingsManager != null)
@@ -286,6 +307,9 @@ public class Engine {
             basicRenderer.destroy();
         if (shaderManager != null)
             shaderManager.destroy();
+        if (textRenderer != null)
+            textRenderer.destroy();
+        GLFW.glfwTerminate();
     }
 
     public InputManager getInputManager() {
@@ -338,5 +362,9 @@ public class Engine {
 
     public ShaderManager getShaderManager() {
         return shaderManager;
+    }
+
+    public TextRenderer getTextRenderer() {
+        return textRenderer;
     }
 }
