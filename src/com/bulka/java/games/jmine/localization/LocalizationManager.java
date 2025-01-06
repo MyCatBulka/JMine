@@ -44,7 +44,11 @@ public class LocalizationManager {
     }
 
     public String get(String key){
-        return bundle.getString(key);
+        String out = bundle.getString(key);
+        if(!out.isEmpty())
+            return out;
+        else
+            return key;
     }
 
     public ResourceBundle getBundle() {

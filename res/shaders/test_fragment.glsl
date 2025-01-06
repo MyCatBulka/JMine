@@ -10,4 +10,5 @@ uniform float time;
 
 void main(){
     outColor = texture(tex, texCoords);
+//    outColor = vec4(pos, 1.0);
 }

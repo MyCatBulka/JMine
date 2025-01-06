@@ -75,11 +75,27 @@ public class SettingsManager {
         return out;
     }
     public int getInt(String key){
-        return Integer.parseInt(get(key));
+        try {
+            return Integer.parseInt(get(key));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
     public int getInt(String key, int defaultValue){
-        return Integer.parseInt(get(key, String.valueOf(defaultValue)));
+        try {
+            return Integer.parseInt(get(key, String.valueOf(defaultValue)));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
+    public float getFloat(String key, float defaultValue) {
+        try {
+            return Float.parseFloat(get(key, String.valueOf(defaultValue)));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     public void set(String key, Object value){
         properties.setProperty(key, value.toString());
     }

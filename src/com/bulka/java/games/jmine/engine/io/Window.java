@@ -1,6 +1,7 @@
-package com.bulka.java.games.jmine.engine.window;
+package com.bulka.java.games.jmine.engine.io;
 
 import com.bulka.java.games.jmine.engine.Engine;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -32,13 +33,15 @@ public class Window {
     private double aspect;
     private boolean v_sync = false;
     private Vector3f background = new Vector3f(0.6f, 0.9f, 1.0f); //SKY
+    private Matrix4f projectionMatrix = new Matrix4f();
 //    private Vector3f background = new Vector3f(0.0f, 0.0f, 0.0f);
 
     public void init() {
         width = Engine.getEngine().getSettingsManager().getInt("window.width", 640);
-        height = Engine.getEngine().getSettingsManager().getInt("window.height", 480);
+        height = Engine.getEngine().getSettingsManager().getInt("window.height", 640);
         basicTitle = Engine.getEngine().getLocalizationManager().get("game.title");
         title = basicTitle;
+        
     }
 
     public void create() {
@@ -83,6 +86,9 @@ public class Window {
 
     }
 
+    public void postInit(){
+    }
+
     public void show(boolean val) {
         if (val)
             GLFW.glfwShowWindow(window);
@@ -94,6 +100,7 @@ public class Window {
         if (isResized) {
             GL11.glViewport(0, 0, width, height);
             aspect = (double) width / height;
+            updateProjectionMatrix();
             isResized = false;
         }
         if (windowShouldClose()) {
@@ -101,6 +108,10 @@ public class Window {
             Engine.getEngine().setRunning(false);
         }
 
+    }
+
+    public void updateProjectionMatrix(){
+        Engine.getEngine().getGame().getHero().getCamera().updateProjectionMatrix();
     }
 
     public void clearBG(){
@@ -277,5 +288,9 @@ public class Window {
         background.x = r;
         background.y = g;
         background.z = b;
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
     }
 }

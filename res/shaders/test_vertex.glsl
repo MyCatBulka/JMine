@@ -6,8 +6,12 @@ layout(location = 1) in vec2 textureCoords;
 out vec3 pos;
 out vec2 texCoords;
 
+uniform mat4 projViewMat;
+uniform mat4 modelMat;
+
 void main(){
-    gl_Position = vec4(position, 1.0);
+    gl_Position = projViewMat * modelMat * vec4(position.x, position.y, position.z, 1.0);
+
     pos = position;
     texCoords = textureCoords;
 }

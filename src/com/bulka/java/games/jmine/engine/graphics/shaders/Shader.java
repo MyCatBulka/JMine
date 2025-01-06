@@ -121,7 +121,7 @@ public class Shader {
         FloatBuffer buffer = MemoryUtil.memAllocFloat(16);
         value.get(buffer);
         if(successful)
-            GL20.glUniformMatrix4fv(getUniformLocation(name), true, buffer);
+            GL20.glUniformMatrix4fv(getUniformLocation(name), false, buffer);
     }
 
     public void destroy(){

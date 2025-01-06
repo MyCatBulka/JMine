@@ -1,18 +1,25 @@
 package com.bulka.java.games.jmine.game;
 
 import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.engine.graphics.camera.Camera;
+import com.bulka.java.games.jmine.engine.graphics.camera.Hero;
 import com.bulka.java.games.jmine.engine.graphics.material.Material;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Vertex;
+import com.bulka.java.games.jmine.engine.graphics.objects.GameObject;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
+import com.bulka.java.games.jmine.game.contorls.Controls;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.util.logging.Logger;
 
 public class Game {
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    private Mesh testMesh;
-    private Material testMaterial;
+    private GameObject testGameObject;
+    private Hero hero;
+    private Controls controls;
 
 
     public Game() {
@@ -20,23 +27,40 @@ public class Game {
     }
 
     public void init(){
-        logger.info("Creating mesh");
-        testMesh = new Mesh(new Vertex[]{
-                new Vertex(-1f, 1f, 0.0f, 0.0f, 0.0f),
-                new Vertex(1f, 1f, 0.0f, 1.0f, 0.0f),
-                new Vertex(1f, -1f, 0.0f, 1.0f, 1.0f),
-                new Vertex(-1f, -1f, 0.0f, 0.0f, 1.0f),
+        float size = 0.5f;
+        testGameObject = new GameObject(new Mesh(new Vertex[]{
+                new Vertex(-size, -size, 0, 0.0f, 1.0f),
+                new Vertex(size, -size, 0, 1.0f, 1.0f),
+                new Vertex(size, size, 0, 1.0f, 0.0f),
+                new Vertex(-size, size, 0, 0.0f, 0.0f),
         }, new int[]{
                 0, 1, 2,
                 2, 3, 0
-        });
-        testMesh.create();
+        }), new Material());
+        testGameObject.setModelMatrix(new Matrix4f());
+        testGameObject.getModelMatrix().translate(new Vector3f(0, 0, 0));
+        testGameObject.postInit();
+        logger.info("Creating mesh");
+        testGameObject.getMesh().create();
         logger.info("Created mesh");
         logger.info("Loading test material");
-        testMaterial = new Material();
-        testMaterial.load("/textures/items/apple.png");
+        testGameObject.getMaterial().load("/textures/items/apple.png");
         logger.info("Loaded test material");
 
+        logger.info("Loading contorls");
+        controls = new Controls();
+        controls.load();
+        logger.info("Loaded contorls");
+
+        logger.info("Initializing Hero");
+        hero = new Hero(new Vector3f(0, 0, 5), new Vector3f(0, 0, 0));
+        hero.init();
+        logger.info("Initialized Hero");
+
+    }
+
+    public void postInit(){
+        hero.postInit();
     }
 
     public void preUpdate(){
@@ -44,7 +68,7 @@ public class Game {
     }
 
     public void update(){
-
+        hero.update();
     }
 
     public void postUpdate(){
@@ -52,11 +76,25 @@ public class Game {
     }
 
     public void render(){
-        BasicRenderer.renderMesh(testMesh, Engine.getEngine().getShaderManager().getTestShader(), testMaterial);
+        testGameObject.render();
+        hero.render();
+//        BasicRenderer.renderMesh(testGameObject.getMesh(), testGameObject.getShader(), testGameObject.getMaterial(), null);
     }
 
     public void destroy(){
-        testMesh.destroy();
-        testMaterial.destroy();
+        testGameObject.destroy();
+        controls.destroy();
+    }
+
+    public Hero getHero() {
+        return hero;
+    }
+
+    public GameObject getTestGameObject() {
+        return testGameObject;
+    }
+
+    public Controls getControls() {
+        return controls;
     }
 }

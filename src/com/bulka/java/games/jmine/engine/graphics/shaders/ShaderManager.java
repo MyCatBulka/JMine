@@ -1,7 +1,5 @@
 package com.bulka.java.games.jmine.engine.graphics.shaders;
 
-import com.bulka.java.libs.brul.utils.FileUtils;
-
 import java.util.logging.Logger;
 
 public class ShaderManager {

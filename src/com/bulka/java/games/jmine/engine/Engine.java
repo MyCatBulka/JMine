@@ -1,11 +1,12 @@
 package com.bulka.java.games.jmine.engine;
 
 
+import com.bulka.java.games.jmine.engine.graphics.material.Texture;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.engine.utils.GLUtils;
-import com.bulka.java.games.jmine.engine.window.Window;
+import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.game.Game;
 import com.bulka.java.games.jmine.launcher.Main;
 import com.bulka.java.games.jmine.localization.LocalizationManager;
@@ -49,8 +50,9 @@ public class Engine {
     public void start() {
         try {
             logger.info("Starting engine");
-            logger.info("Adding logo in system tray");
-            addInTray();
+
+            Thread trayThread = new Thread(() -> addInTray(), "SystemTrayAddIcon");
+            trayThread.start();
 
             logger.info("Initializing GLFW");
             if (!GLFW.glfwInit()) {
@@ -58,6 +60,8 @@ public class Engine {
                 throw new RuntimeException("Can`t init GLFW ");
             }
             logger.info("Initialized GLFW");
+
+            Texture.init();
 
             logger.info("Initializing Settings Manager");
             settingsManager = new SettingsManager();
@@ -86,26 +90,30 @@ public class Engine {
             inputManager.init();
             logger.info("Initialized Input Manager");
 
+            logger.info("Initializing ShaderManager and loading Shaders");
+            shaderManager = new ShaderManager();
+            shaderManager.load();
+            logger.info("Initialized ShaderManager and loaded Shaders");
+
             logger.info("Initializing Game");
             game = new Game();
             game.init();
             logger.info("Initialized Game");
 
-            logger.info("Initializing ShaderManager and loading Shaders");
-            shaderManager = new ShaderManager();
-            shaderManager.load();
-            logger.info("Initialized ShaderManager and loaded Shaders");
+
 
             logger.info("Initializing basic renderer");
             basicRenderer = new BasicRenderer();
             basicRenderer.init();
             logger.info("Initialized basic renderer");
 
+            GL11.glEnable(GL11.GL_CULL_FACE);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-            logger.info("All is initialized");
-
+            logger.info("All is initialized, starting postInit");
+            postInit();
+            logger.info("Successful postInitialized");
 
             logger.info("Showing window");
             window.show(true);
@@ -127,8 +135,14 @@ public class Engine {
 
     }
 
+    private void postInit(){
+        window.postInit();
+        game.postInit();
+    }
+
     private void addInTray() {
         try {
+            logger.info("Adding logo in system tray");
             SystemTray tray = SystemTray.getSystemTray();
             Image image = ImageIO.read(Objects.requireNonNull(Engine.class.getResourceAsStream("/textures/items/apple.png")));
             TrayIcon trayIcon = new TrayIcon(image);
@@ -175,12 +189,6 @@ public class Engine {
             GLFW.glfwSwapBuffers(window.getWindow());
             renderTime = (double) (System.nanoTime() - timeRenderStart) / 1_000_000_000;
 
-            error = GL11.glGetError();
-            if (error != GL11.GL_NO_ERROR) {
-                String errorMessage = GLUtils.getErrorMessage(error);
-                logger.severe("Got OpenGL error " + error + ": " + errorMessage);
-            }
-
             deltaTime = (double) (System.nanoTime() - timeFrameStart) / 1_000_000_000;
 
             FPSCounter++;
@@ -193,6 +201,22 @@ public class Engine {
             }
         }
         exit(0);
+    }
+
+    public int checkErrorsGL(){
+        int error = GL11.glGetError();
+        if (error != GL11.GL_NO_ERROR)
+            return error;
+        else
+            return 0;
+    }
+
+    public void printErrorsGL(){
+        int error = checkErrorsGL();
+        if(error != 0) {
+            String errorMessage = GLUtils.getErrorMessage(error);
+            logger.severe("Got OpenGL error " + error + ": " + errorMessage);
+        }
     }
 
     public void preUpdate() {
