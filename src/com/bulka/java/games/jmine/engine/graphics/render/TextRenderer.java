@@ -11,6 +11,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+@Deprecated
 public class TextRenderer {
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private long vg;

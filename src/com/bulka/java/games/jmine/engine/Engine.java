@@ -1,9 +1,9 @@
 package com.bulka.java.games.jmine.engine;
 
 
-import com.bulka.java.games.jmine.engine.graphics.material.Texture;
+import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
-import com.bulka.java.games.jmine.engine.graphics.render.TextRenderer;
+import com.bulka.java.games.jmine.engine.graphics.render.TextRendererGL;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.engine.utils.GLUtils;
@@ -12,10 +12,7 @@ import com.bulka.java.games.jmine.game.Game;
 import com.bulka.java.games.jmine.launcher.Main;
 import com.bulka.java.games.jmine.localization.LocalizationManager;
 import com.bulka.java.games.jmine.settings.SettingsManager;
-import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.nanovg.NanoVG;
 import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
@@ -35,7 +32,7 @@ public class Engine {
     private Game game;
     private BasicRenderer basicRenderer;
     private ShaderManager shaderManager;
-    private TextRenderer textRenderer;
+    private TextRendererGL textRenderer;
 
     private boolean showCursor = true;
     private boolean running = false;
@@ -46,11 +43,8 @@ public class Engine {
     private long FPSTime;
     public static final int FPS_PERIOD = 500;
     public static final int FPS_CHANGING_IN_SECONDS = 1000 / FPS_PERIOD;
-    private long timeFrameStart;
     private double deltaTime;
-    private long timeUpdateStart;
     private double updateTime;
-    private long timeRenderStart;
     private double renderTime;
 
 
@@ -115,16 +109,18 @@ public class Engine {
             logger.info("Initialized basic renderer");
 
             logger.info("Initializing text renderer");
-            textRenderer = new TextRenderer();
+            textRenderer = new TextRendererGL();
             textRenderer.load();
             logger.info("Initialized text renderer");
 
 
-            GL11.glEnable(GL11.GL_CULL_FACE);
+//            GL11.glEnable(GL11.GL_CULL_FACE);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glEnable(GL11.GL_STENCIL_TEST);
+//            GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
 
             logger.info("All is initialized, starting postInit");
             postInit();
@@ -190,6 +186,9 @@ public class Engine {
     }
 
     public void loop() {
+        long timeFrameStart;
+        long timeUpdateStart;
+        long timeRenderStart;
         while (running) {
             timeFrameStart = System.nanoTime();
             timeUpdateStart = System.nanoTime();
@@ -272,10 +271,11 @@ public class Engine {
     public void render() {
         window.clearBG();
 
-        NanoVG.nvgBeginFrame(textRenderer.getVg(), window.getWidth(), window.getHeight(), 1.0f);
+
+//        NanoVG.nvgBeginFrame(textRenderer.getVg(), window.getWidth(), window.getHeight(), 1.0f);
         game.render();
         basicRenderer.render();
-        NanoVG.nvgEndFrame(textRenderer.getVg());
+//        NanoVG.nvgEndFrame(textRenderer.getVg());
     }
 
     public static Engine getEngine() {
@@ -364,7 +364,7 @@ public class Engine {
         return shaderManager;
     }
 
-    public TextRenderer getTextRenderer() {
+    public TextRendererGL getTextRenderer() {
         return textRenderer;
     }
 }

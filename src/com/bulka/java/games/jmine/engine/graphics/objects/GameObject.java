@@ -1,7 +1,7 @@
 package com.bulka.java.games.jmine.engine.graphics.objects;
 
 import com.bulka.java.games.jmine.engine.Engine;
-import com.bulka.java.games.jmine.engine.graphics.material.Material;
+import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
@@ -9,7 +9,7 @@ import org.joml.Matrix4f;
 
 public class GameObject {
     private Mesh mesh;
-    private Material material;
+    private Texture texture;
     private Matrix4f modelMatrix;
     private Shader shader;
 
@@ -22,21 +22,21 @@ public class GameObject {
         modelMatrix = new Matrix4f();
     }
 
-    public GameObject(Mesh mesh, Material material) {
+    public GameObject(Mesh mesh, Texture texture) {
         this.mesh = mesh;
-        this.material = material;
+        this.texture = texture;
         modelMatrix = new Matrix4f();
     }
 
-    public GameObject(Mesh mesh, Material material, Matrix4f modelMatrix) {
+    public GameObject(Mesh mesh, Texture texture, Matrix4f modelMatrix) {
         this.mesh = mesh;
-        this.material = material;
+        this.texture = texture;
         this.modelMatrix = modelMatrix;
     }
 
-    public GameObject(Mesh mesh, Material material, Matrix4f modelMatrix, Shader shader) {
+    public GameObject(Mesh mesh, Texture texture, Matrix4f modelMatrix, Shader shader) {
         this.mesh = mesh;
-        this.material = material;
+        this.texture = texture;
         this.modelMatrix = modelMatrix;
         this.shader = shader;
     }
@@ -64,12 +64,12 @@ public class GameObject {
         this.mesh = mesh;
     }
 
-    public Material getMaterial() {
-        return material;
+    public Texture getTexture() {
+        return texture;
     }
 
-    public void setMaterial(Material material) {
-        this.material = material;
+    public void setTexture(Texture texture) {
+        this.texture = texture;
     }
 
     public Matrix4f getModelMatrix() {
@@ -90,6 +90,6 @@ public class GameObject {
 
     public void destroy(){
         mesh.destroy();
-        material.destroy();
+        texture.destroy();
     }
 }

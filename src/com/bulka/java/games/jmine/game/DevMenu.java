@@ -14,7 +14,7 @@ public class DevMenu {
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private String text = "";
     private Color color = Color.BLACK;
-    private float fontSize = 16f;
+    private int fontSize = 16;
     private boolean show = false;
 
     public void init(){
@@ -36,12 +36,9 @@ public class DevMenu {
     }
 
     public void render(){
-        if(show) {
-            String[] lines = text.split("\n");
-            for (int i = 0; i < lines.length; i++) {
-                Engine.getEngine().getTextRenderer().render(lines[i], 0, (int) fontSize * (i + 1), fontSize, "default", color);
-            }
-        }
+//                Engine.getEngine().getTextRenderer().render(lines[i], 0, (int) fontSize * (i + 1), fontSize, color);
+        if(show)
+            Engine.getEngine().getTextRenderer().render(text, 0, 300, fontSize, color);
     }
 
     public void destroy(){
@@ -56,11 +53,11 @@ public class DevMenu {
         this.show = show;
     }
 
-    public float getFontSize() {
+    public int getFontSize() {
         return fontSize;
     }
 
-    public void setFontSize(float fontSize) {
+    public void setFontSize(int fontSize) {
         this.fontSize = fontSize;
     }
 

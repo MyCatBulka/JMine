@@ -1,11 +1,6 @@
 package com.bulka.java.games.jmine.engine.graphics.render;
 
-import com.bulka.java.games.jmine.engine.Engine;
-import com.bulka.java.games.jmine.engine.graphics.material.Material;
-import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.objects.GameObject;
-import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -41,7 +36,7 @@ public class BasicRenderer {
         if(gameObject.getMesh().getIBO() != 0) {
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, gameObject.getMesh().getIBO());
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            GL13.glBindTexture(GL13.GL_TEXTURE_2D, gameObject.getMaterial().getTextureID());
+            GL13.glBindTexture(GL13.GL_TEXTURE_2D, gameObject.getTexture().getTextureID());
             gameObject.getShader().bind();
             gameObject.getShader().setUniform("modelMat", gameObject.getModelMatrix());
             gameObject.getShader().setUniform("time", (float) GLFW.glfwGetTime());

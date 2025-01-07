@@ -1,19 +1,15 @@
 package com.bulka.java.games.jmine.game;
 
 import com.bulka.java.games.jmine.engine.Engine;
-import com.bulka.java.games.jmine.engine.graphics.camera.Camera;
 import com.bulka.java.games.jmine.engine.graphics.camera.Hero;
-import com.bulka.java.games.jmine.engine.graphics.material.Material;
+import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Vertex;
 import com.bulka.java.games.jmine.engine.graphics.objects.GameObject;
-import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
-import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.game.contorls.Controls;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.awt.*;
 import java.util.logging.Logger;
 
 public class Game {
@@ -43,7 +39,7 @@ public class Game {
         }, new int[]{
                 0, 1, 2,
                 2, 3, 0
-        }), new Material());
+        }), new Texture());
         testGameObject.setModelMatrix(new Matrix4f());
         testGameObject.getModelMatrix().translate(new Vector3f(0, 0, 0));
         testGameObject.postInit();
@@ -51,7 +47,7 @@ public class Game {
         testGameObject.getMesh().create();
         logger.info("Created mesh");
         logger.info("Loading test material");
-        testGameObject.getMaterial().load("/textures/items/apple.png");
+        testGameObject.getTexture().load("/textures/items/apple.png");
         logger.info("Loaded test material");
 
         logger.info("Loading contorls");

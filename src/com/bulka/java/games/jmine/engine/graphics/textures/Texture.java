@@ -1,4 +1,4 @@
-package com.bulka.java.games.jmine.engine.graphics.material;
+package com.bulka.java.games.jmine.engine.graphics.textures;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
@@ -6,7 +6,6 @@ import org.lwjgl.system.MemoryUtil;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -109,6 +108,18 @@ public class Texture {
 
     public int getTextureID() {
         return textureID;
+    }
+
+    public void setTextureID(int textureID) {
+        this.textureID = textureID;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public void destroy(){

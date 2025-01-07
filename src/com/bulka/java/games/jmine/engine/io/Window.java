@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -33,7 +34,7 @@ public class Window {
     private double aspect;
     private boolean v_sync = false;
     private Vector3f background = new Vector3f(0.6f, 0.9f, 1.0f); //SKY
-    private Matrix4f projectionMatrix = new Matrix4f();
+    private Matrix4f orthoMatrix;
 //    private Vector3f background = new Vector3f(0.0f, 0.0f, 0.0f);
 
     public void init() {
@@ -73,7 +74,6 @@ public class Window {
         setWindowInCenter();
         GLFW.glfwMakeContextCurrent(window);
         GL.createCapabilities();
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
 
         GLFW.glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
             @Override
@@ -101,6 +101,7 @@ public class Window {
             GL11.glViewport(0, 0, width, height);
             aspect = (double) width / height;
             updateProjectionMatrix();
+            updateOrthoMatrix();
             isResized = false;
         }
         if (windowShouldClose()) {
@@ -108,6 +109,11 @@ public class Window {
             Engine.getEngine().setRunning(false);
         }
 
+    }
+
+    private void updateOrthoMatrix() {
+        orthoMatrix = new Matrix4f().ortho2D(0, width, height, 0);
+        Engine.getEngine().getShaderManager().getTextShader().setUniform("orthoProj", orthoMatrix);
     }
 
     public void updateProjectionMatrix(){
@@ -290,8 +296,12 @@ public class Window {
         background.z = b;
     }
 
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
+    public boolean isResized() {
+        return isResized;
+    }
+
+    public Matrix4f getOrthoMatrix() {
+        return orthoMatrix;
     }
 
     public void destroy() {
