@@ -1,4 +1,4 @@
-package com.bulka.java.games.jmine.game.contorls;
+package com.bulka.java.games.jmine.game.client.contorls;
 
 import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.settings.SettingsManager;

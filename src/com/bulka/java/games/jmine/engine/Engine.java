@@ -5,9 +5,11 @@ import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.render.TextRendererGL;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
+import com.bulka.java.games.jmine.engine.graphics.textures.Textures;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.engine.utils.GLUtils;
+import com.bulka.java.games.jmine.game.DevMenu;
 import com.bulka.java.games.jmine.game.Game;
 import com.bulka.java.games.jmine.launcher.Main;
 import com.bulka.java.games.jmine.localization.LocalizationManager;
@@ -33,6 +35,7 @@ public class Engine implements Runnable{
     private BasicRenderer basicRenderer;
     private ShaderManager shaderManager;
     private TextRendererGL textRenderer;
+    private Textures textures;
 
     private boolean showCursor = true;
     private boolean running = false;
@@ -62,7 +65,7 @@ public class Engine implements Runnable{
             }
             logger.info("Initialized GLFW");
 
-            Texture.init();
+//            Texture.init();
 
             logger.info("Initializing Settings Manager");
             settingsManager = new SettingsManager();
@@ -95,6 +98,10 @@ public class Engine implements Runnable{
             shaderManager = new ShaderManager();
             shaderManager.load();
             logger.info("Initialized ShaderManager and loaded Shaders");
+            logger.info("Initializing Textures");
+            textures = new Textures();
+            textures.init();
+            logger.info("Initialized Textures");
 
             logger.info("Initializing Game");
             game = new Game();
@@ -214,6 +221,7 @@ public class Engine implements Runnable{
                 FPSTime = System.currentTimeMillis();
                 FPSCounter = 0;
                 window.setTitle(window.getBasicTitle() + "; FPS: " + FPS);
+                DevMenu.getSelf().updateValues();
 //                System.out.println(String.format(Locale.US, "FPS: %d; deltaTime: %f; updateTime: %f; renderTime: %f", FPS, deltaTime, updateTime, renderTime));
             }
         }
@@ -275,8 +283,8 @@ public class Engine implements Runnable{
 
 
 //        NanoVG.nvgBeginFrame(textRenderer.getVg(), window.getWidth(), window.getHeight(), 1.0f);
-        game.render();
         basicRenderer.render();
+        game.render();
 //        NanoVG.nvgEndFrame(textRenderer.getVg());
     }
 
@@ -311,6 +319,8 @@ public class Engine implements Runnable{
             shaderManager.destroy();
         if (textRenderer != null)
             textRenderer.destroy();
+        if (textures != null)
+            textures.destroy();
         GLFW.glfwTerminate();
     }
 
@@ -368,5 +378,9 @@ public class Engine implements Runnable{
 
     public TextRendererGL getTextRenderer() {
         return textRenderer;
+    }
+
+    public Textures getTextures() {
+        return textures;
     }
 }

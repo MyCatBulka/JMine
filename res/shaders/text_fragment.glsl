@@ -5,8 +5,9 @@ out vec4 fragColor;
 
 uniform sampler2D fontTexture;
 uniform vec4 textColor;
+uniform vec4 bgColor;
 
 void main() {
     float c = texture(fontTexture, texCoord).r;
-    fragColor = vec4(c * textColor.r, c * textColor.g, c * textColor.b, c * textColor.a);
+    fragColor = textColor*c+bgColor;
 }

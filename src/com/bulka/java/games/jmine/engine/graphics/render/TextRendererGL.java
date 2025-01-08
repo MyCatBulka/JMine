@@ -29,7 +29,7 @@ public class TextRendererGL {
         getFontTexture(14);
     }
 
-    public void render(String text, int x, int y, int size, Color color) {
+    public void render(String text, int x, int y, int size, Color color, Color bg) {
         FontTexture fontTexture = getFontTexture(size);
         int charHeight = fontTexture.getCharHeight();
         int[] charWidthArray = fontTexture.getCharWidths();
@@ -42,7 +42,14 @@ public class TextRendererGL {
                 color.getBlue() / 255.0f,
                 color.getAlpha() / 255.0f
         );
+        Vector4f bgColor = new Vector4f(
+                bg.getRed() / 255.0f,
+                bg.getGreen() / 255.0f,
+                bg.getBlue() / 255.0f,
+                bg.getAlpha() / 255.0f
+        );
         textShader.setUniform("textColor", textColor);
+        textShader.setUniform("bgColor", bgColor);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, fontTexture.getTextureID());
 
         int maxVertices = text.length() * 16;

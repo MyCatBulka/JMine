@@ -6,7 +6,8 @@ import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Vertex;
 import com.bulka.java.games.jmine.engine.graphics.objects.GameObject;
-import com.bulka.java.games.jmine.game.contorls.Controls;
+import com.bulka.java.games.jmine.engine.graphics.textures.Textures;
+import com.bulka.java.games.jmine.game.client.contorls.Controls;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -39,7 +40,7 @@ public class Game {
         }, new int[]{
                 0, 1, 2,
                 2, 3, 0
-        }), new Texture());
+        }), Textures.getSelf().getTexture("/textures/items/apple.png"));
 
         testGameObject.setModelMatrix(new Matrix4f());
         testGameObject.getModelMatrix().translate(new Vector3f(0, 0, 0));
@@ -48,7 +49,6 @@ public class Game {
         testGameObject.getMesh().create();
         logger.info("Created mesh");
         logger.info("Loading test material");
-        testGameObject.getTexture().load("/textures/items/apple.png");
         logger.info("Loaded test material");
 
         logger.info("Loading contorls");

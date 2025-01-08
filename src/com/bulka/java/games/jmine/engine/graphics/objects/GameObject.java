@@ -7,11 +7,12 @@ import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
 
 public class GameObject {
     private Mesh mesh;
-    private Texture texture;
-    private Matrix4f modelMatrix;
+    private int texture;
+    private Matrix4f modelMatrix = new Matrix4f();
     private Shader shader;
 
     public GameObject() {
@@ -23,19 +24,23 @@ public class GameObject {
         modelMatrix = new Matrix4f();
     }
 
-    public GameObject(Mesh mesh, Texture texture) {
+    public GameObject(Mesh mesh, Matrix4f modelMatrix) {
         this.mesh = mesh;
-        this.texture = texture;
-        modelMatrix = new Matrix4f();
-    }
-
-    public GameObject(Mesh mesh, Texture texture, Matrix4f modelMatrix) {
-        this.mesh = mesh;
-        this.texture = texture;
         this.modelMatrix = modelMatrix;
     }
 
-    public GameObject(Mesh mesh, Texture texture, Matrix4f modelMatrix, Shader shader) {
+    public GameObject(Mesh mesh,Matrix4f modelMatrix, Shader shader) {
+        this.mesh = mesh;
+        this.modelMatrix = modelMatrix;
+        this.shader = shader;
+    }
+
+    public GameObject(Mesh mesh, int texture) {
+        this.mesh = mesh;
+        this.texture = texture;
+    }
+
+    public GameObject(Mesh mesh, int texture, Matrix4f modelMatrix, Shader shader) {
         this.mesh = mesh;
         this.texture = texture;
         this.modelMatrix = modelMatrix;
@@ -65,11 +70,11 @@ public class GameObject {
         this.mesh = mesh;
     }
 
-    public Texture getTexture() {
+    public int getTexture() {
         return texture;
     }
 
-    public void setTexture(Texture texture) {
+    public void setTexture(int texture) {
         this.texture = texture;
     }
 
@@ -91,6 +96,6 @@ public class GameObject {
 
     public void destroy(){
         mesh.destroy();
-        texture.destroy();
+        GL11.glDeleteTextures(texture);
     }
 }

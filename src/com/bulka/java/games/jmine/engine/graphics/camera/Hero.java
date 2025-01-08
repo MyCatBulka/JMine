@@ -2,7 +2,7 @@ package com.bulka.java.games.jmine.engine.graphics.camera;
 
 import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.io.InputManager;
-import com.bulka.java.games.jmine.game.contorls.Controls;
+import com.bulka.java.games.jmine.game.client.contorls.Controls;
 import org.joml.Vector3f;
 
 import java.util.logging.Logger;
@@ -12,8 +12,8 @@ public class Hero {
     private Vector3f position;
     private Vector3f rotation;
     private Camera camera;
-    private final float speed = 10f;
-    private final float verticalSpeed = 10f;
+    private float speed = 10f;
+    private float verticalSpeed = 10f;
 
     public Hero() {
 
@@ -140,6 +140,22 @@ public class Hero {
 
     public void setRotation(Vector3f rotation) {
         this.rotation = rotation;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public float getVerticalSpeed() {
+        return verticalSpeed;
+    }
+
+    public void setVerticalSpeed(float verticalSpeed) {
+        this.verticalSpeed = verticalSpeed;
     }
 
     public static Hero getSelf(){

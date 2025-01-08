@@ -1,5 +1,7 @@
 package com.bulka.java.games.jmine.engine.graphics.textures;
 
+import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.engine.ILogic;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
@@ -7,48 +9,72 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Deprecated
-public class Texture {
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
+public class Textures implements ILogic {
+    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private Map<String, Integer> textures;
+    public static BufferedImage emptyTexture;
+    static {
+        int width = 16;
+        int height = 16;
 
-    private int textureID;
-    private int width;
-    private int height;
+        emptyTexture = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-
-
-    public Texture(){
-
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if ((x + y) % 2 == 0) {
+                    emptyTexture.setRGB(x, y, Color.BLACK.getRGB());
+                } else {
+                    emptyTexture.setRGB(x, y, new Color(128, 0, 128).getRGB()); // Фиолетовый
+                }
+            }
+        }
     }
 
-    public void load(String path){
+    @Override
+    public void init() {
+        textures = new HashMap<>();
+    }
+
+    public int getTexture(String path){
+        Integer texture = textures.get(path);
+        if(texture == null){
+            texture = loadTexture(path);
+            textures.put(path, texture);
+        }
+        return texture;
+    }
+
+    public int loadTexture(String path){
+        int texture = 0;
         try {
             logger.config("Loading texture: " + path);
             BufferedImage image;
             try {
                 image = ImageIO.read(Objects.requireNonNull(this.getClass().getResourceAsStream(path)));
                 logger.config("Successful loaded image, creating texture: " + path);
-                load(image);
+                texture = loadTexture(image);
                 logger.config("Successful created texture: " + path);
             } catch (Exception e) {
                 logger.warning("Can`t load image: " + path);
-                image = Textures.emptyTexture;
-                load(image);
+                image = emptyTexture;
+                texture = loadTexture(image);
                 logger.config("Successful created standard texture: " + path);
             }
 
         } catch (Exception e) {
             logger.log(Level.SEVERE,"!!Can`t load texture: " + path, e);
         }
+        return texture;
     }
-
-    public void load(BufferedImage image){
-        width = image.getWidth();
-        height = image.getHeight();
+    public int loadTexture(BufferedImage image){
+        int width = image.getWidth();
+        int height = image.getHeight();
         int[] pixels = new int[width * height];
         image.getRGB(0, 0, width, height, pixels, 0, width);
         ByteBuffer buffer = MemoryUtil.memAlloc(width*height*4);
@@ -73,40 +99,22 @@ public class Texture {
             }
         }
         buffer.flip();
-        textureID = GL11.glGenTextures();
+        int textureID = GL11.glGenTextures();
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
-    }
 
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getTextureID() {
         return textureID;
     }
 
-    public void setTextureID(int textureID) {
-        this.textureID = textureID;
+    @Override
+    public void destroy() {
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public void destroy(){
-        GL11.glDeleteTextures(textureID);
+    public static Textures getSelf(){
+        return Engine.getEngine().getTextures();
     }
 }
