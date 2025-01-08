@@ -17,25 +17,19 @@ public class DevMenu {
 
     public void init() {
         fontSize = (int) (14 * Engine.getEngine().getSettingsManager().getFloat("game.graphics.ui.scale", 1f));
-        StringBuilder sb = new StringBuilder(LoremIpsumGenerator.generate(2500));
-        for (int i = 0; i < sb.length(); i+=300) {
-            sb.setCharAt(i, '\n');
-        }
-        text = sb.toString();
     }
 
     public void postInit() {
-//        lineHeight = Engine.getEngine().getTextRenderer().getTextBounds("Bulka", fontSize, "default").y;
     }
 
     public void update() {
         if (Engine.getEngine().getInputManager().isKeyTypedClicked(Engine.getEngine().getGame().getControls().devMenu))
             show = !show;
         if (show) {
-//            text = TextUtils.format("JMine $\nFPS: $\nHero: x:$; y:$; z:$, p:$; y:$", Engine.VERSION,
-//                    Engine.getEngine().getFPS(),
-//                    Engine.getEngine().getGame().getHero().getPosition().x, Engine.getEngine().getGame().getHero().getPosition().y, Engine.getEngine().getGame().getHero().getPosition().z, Engine.getEngine().getGame().getHero().getRotation().x, Engine.getEngine().getGame().getHero().getRotation().y
-//            );
+            text = TextUtils.format("JMine $\nFPS: $\nHero: x:$; y:$; z:$, p:$; y:$", Engine.VERSION,
+                    Engine.getEngine().getFPS(),
+                    Engine.getEngine().getGame().getHero().getPosition().x, Engine.getEngine().getGame().getHero().getPosition().y, Engine.getEngine().getGame().getHero().getPosition().z, Engine.getEngine().getGame().getHero().getRotation().x, Engine.getEngine().getGame().getHero().getRotation().y
+            );
         }
     }
 
