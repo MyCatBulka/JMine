@@ -1,6 +1,10 @@
 package com.bulka.java.games.jmine.engine.io;
 
 import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.engine.graphics.camera.Camera;
+import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
+import com.bulka.java.games.jmine.localization.LocalizationManager;
+import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -14,7 +18,7 @@ import java.awt.*;
 import java.util.logging.Logger;
 
 public class Window {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private int width;
     private int height;
@@ -35,12 +39,13 @@ public class Window {
     private boolean v_sync = false;
     private Vector3f background = new Vector3f(0.6f, 0.9f, 1.0f); //SKY
     private Matrix4f orthoMatrix;
+    private Matrix4f normalizedOrthoMatrix;
 //    private Vector3f background = new Vector3f(0.0f, 0.0f, 0.0f);
 
     public void init() {
-        width = Engine.getEngine().getSettingsManager().getInt("window.width", 640);
-        height = Engine.getEngine().getSettingsManager().getInt("window.height", 640);
-        basicTitle = Engine.getEngine().getLocalizationManager().get("game.title");
+        width = SettingsManager.getSelf().getInt("window.width", 640);
+        height = SettingsManager.getSelf().getInt("window.height", 640);
+        basicTitle = LocalizationManager.getSelf().get("game.title");
         title = basicTitle;
         
     }
@@ -87,6 +92,8 @@ public class Window {
     }
 
     public void postInit(){
+        normalizedOrthoMatrix = new Matrix4f().ortho2D(-1, 1, -1, 1);
+        ShaderManager.getSelf().getTextShader().setUniform("normOrthoProj", normalizedOrthoMatrix);
     }
 
     public void show(boolean val) {
@@ -113,13 +120,13 @@ public class Window {
 
     private void updateOrthoMatrix() {
         orthoMatrix = new Matrix4f().ortho2D(0, width, height, 0);
-        Engine.getEngine().getShaderManager().getTextShader().bind();
-        Engine.getEngine().getShaderManager().getTextShader().setUniform("orthoProj", orthoMatrix);
-        Engine.getEngine().getShaderManager().getTextShader().unBind();
+        ShaderManager.getSelf().getTextShader().bind();
+        ShaderManager.getSelf().getTextShader().setUniform("orthoProj", orthoMatrix);
+        ShaderManager.getSelf().getTextShader().unBind();
     }
 
     public void updateProjectionMatrix(){
-        Engine.getEngine().getGame().getHero().getCamera().updateProjectionMatrix();
+        Camera.getSelf().updateProjectionMatrix();
     }
 
     public void clearBG(){
@@ -308,5 +315,13 @@ public class Window {
 
     public void destroy() {
         GLFW.glfwDestroyWindow(window);
+    }
+
+    public Matrix4f getNormalizedOrthoMatrix() {
+        return normalizedOrthoMatrix;
+    }
+
+    public static Window getSelf(){
+        return Engine.getEngine().getWindow();
     }
 }

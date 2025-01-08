@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FontTexture {
-    private static Logger logger = Logger.getLogger(FontTexture.class.getName());
+    private static final Logger logger = Logger.getLogger(FontTexture.class.getName());
     private int textureID = 0;
     private int imageWidth = 0, imageHeight = 0;
     private int charHeight = 0;

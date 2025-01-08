@@ -1,6 +1,7 @@
 package com.bulka.java.games.jmine.game.contorls;
 
 import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.lwjgl.glfw.GLFW;
 
 public class Controls {
@@ -14,18 +15,22 @@ public class Controls {
     public int devMenu = GLFW.GLFW_KEY_F3;
 
     public void load(){
-        mouseSensitivity = Engine.getEngine().getSettingsManager().getFloat("game.controls.mouse_sensitivity", 0.2f);
-        forward = Engine.getEngine().getSettingsManager().getInt("game.controls.forward", GLFW.GLFW_KEY_W);
-        back = Engine.getEngine().getSettingsManager().getInt("game.controls.back", GLFW.GLFW_KEY_S);
-        left = Engine.getEngine().getSettingsManager().getInt("game.controls.left", GLFW.GLFW_KEY_A);
-        right = Engine.getEngine().getSettingsManager().getInt("game.controls.right", GLFW.GLFW_KEY_D);
-        up = Engine.getEngine().getSettingsManager().getInt("game.controls.up", GLFW.GLFW_KEY_SPACE);
-        down = Engine.getEngine().getSettingsManager().getInt("game.controls.down", GLFW.GLFW_KEY_LEFT_SHIFT);
-        devMenu = Engine.getEngine().getSettingsManager().getInt("game.controls.dev_menu", GLFW.GLFW_KEY_F3);
+        mouseSensitivity = SettingsManager.getSelf().getFloat("game.controls.mouse_sensitivity", 0.2f);
+        forward = SettingsManager.getSelf().getInt("game.controls.forward", GLFW.GLFW_KEY_W);
+        back = SettingsManager.getSelf().getInt("game.controls.back", GLFW.GLFW_KEY_S);
+        left = SettingsManager.getSelf().getInt("game.controls.left", GLFW.GLFW_KEY_A);
+        right = SettingsManager.getSelf().getInt("game.controls.right", GLFW.GLFW_KEY_D);
+        up = SettingsManager.getSelf().getInt("game.controls.up", GLFW.GLFW_KEY_SPACE);
+        down = SettingsManager.getSelf().getInt("game.controls.down", GLFW.GLFW_KEY_LEFT_SHIFT);
+        devMenu = SettingsManager.getSelf().getInt("game.controls.dev_menu", GLFW.GLFW_KEY_F3);
     }
 
 
     public void destroy() {
 
+    }
+
+    public static Controls getSelf(){
+        return Engine.getEngine().getGame().getControls();
     }
 }

@@ -1,17 +1,19 @@
 package com.bulka.java.games.jmine.engine.graphics.camera;
 
 import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.engine.io.InputManager;
+import com.bulka.java.games.jmine.game.contorls.Controls;
 import org.joml.Vector3f;
 
 import java.util.logging.Logger;
 
 public class Hero {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private Vector3f position;
     private Vector3f rotation;
     private Camera camera;
-    private float speed = 10f;
-    private float verticalSpeed = 10f;
+    private final float speed = 10f;
+    private final float verticalSpeed = 10f;
 
     public Hero() {
 
@@ -43,38 +45,38 @@ public class Hero {
         boolean changed = false;
         float deltaTime = (float) Engine.getEngine().getDeltaTime();
 
-        if(Engine.getEngine().getInputManager().isInWindow() && !Engine.getEngine().isShowCursor()) {
-            if (Engine.getEngine().getInputManager().getMouseMovementX() != 0) {
-                addRotation(0, (float) Engine.getEngine().getInputManager().getMouseMovementX() * Engine.getEngine().getGame().getControls().mouseSensitivity, 0);
+        if(InputManager.getSelf().isInWindow() && !Engine.getEngine().isShowCursor()) {
+            if (InputManager.getSelf().getMouseMovementX() != 0) {
+                addRotation(0, (float) InputManager.getSelf().getMouseMovementX() * Controls.getSelf().mouseSensitivity, 0);
                 changed = true;
             }
-            if (Engine.getEngine().getInputManager().getMouseMovementY() != 0) {
-                addRotation((float) Engine.getEngine().getInputManager().getMouseMovementY() * Engine.getEngine().getGame().getControls().mouseSensitivity, 0, 0);
+            if (InputManager.getSelf().getMouseMovementY() != 0) {
+                addRotation((float) InputManager.getSelf().getMouseMovementY() * Controls.getSelf().mouseSensitivity, 0, 0);
                 changed = true;
             }
         }
 
-        if(Engine.getEngine().getInputManager().isKeyDown(Engine.getEngine().getGame().getControls().forward)){
+        if(InputManager.getSelf().isKeyDown(Controls.getSelf().forward)){
             addPosition(0, 0, -speed * deltaTime);
             changed = true;
         }
-        if(Engine.getEngine().getInputManager().isKeyDown(Engine.getEngine().getGame().getControls().back)){
+        if(InputManager.getSelf().isKeyDown(Controls.getSelf().back)){
             addPosition(0, 0, speed * deltaTime);
             changed = true;
         }
-        if(Engine.getEngine().getInputManager().isKeyDown(Engine.getEngine().getGame().getControls().left)){
+        if(InputManager.getSelf().isKeyDown(Controls.getSelf().left)){
             addPosition(-speed * deltaTime, 0, 0);
             changed = true;
         }
-        if(Engine.getEngine().getInputManager().isKeyDown(Engine.getEngine().getGame().getControls().right)){
+        if(InputManager.getSelf().isKeyDown(Controls.getSelf().right)){
             addPosition(speed * deltaTime, 0, 0);
             changed = true;
         }
-        if(Engine.getEngine().getInputManager().isKeyDown(Engine.getEngine().getGame().getControls().up)){
+        if(InputManager.getSelf().isKeyDown(Controls.getSelf().up)){
             addPosition(0, verticalSpeed * deltaTime, 0);
             changed = true;
         }
-        if(Engine.getEngine().getInputManager().isKeyDown(Engine.getEngine().getGame().getControls().down)){
+        if(InputManager.getSelf().isKeyDown(Controls.getSelf().down)){
             addPosition(0, -verticalSpeed * deltaTime, 0);
             changed = true;
         }
@@ -138,5 +140,9 @@ public class Hero {
 
     public void setRotation(Vector3f rotation) {
         this.rotation = rotation;
+    }
+
+    public static Hero getSelf(){
+        return Engine.getEngine().getGame().getHero();
     }
 }

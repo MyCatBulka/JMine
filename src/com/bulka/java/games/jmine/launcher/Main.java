@@ -7,7 +7,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class Main {
-    private static Logger logger = Logger.getLogger(Main.class.getName());
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     private static Engine engine;
     public static void main(String[] args) {
@@ -16,10 +16,11 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        logger.info("Starting");
-
         engine = new Engine();
-        engine.start();
+        logger.info("Starting");
+        Thread thread = new Thread(engine);
+        thread.setName("Engine");
+        thread.start();
     }
 
     public static Engine getEngine() {

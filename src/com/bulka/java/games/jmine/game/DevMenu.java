@@ -1,7 +1,11 @@
 package com.bulka.java.games.jmine.game;
 
 import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.engine.graphics.camera.Hero;
 import com.bulka.java.games.jmine.engine.graphics.render.TextRendererGL;
+import com.bulka.java.games.jmine.engine.io.InputManager;
+import com.bulka.java.games.jmine.game.contorls.Controls;
+import com.bulka.java.games.jmine.settings.SettingsManager;
 import com.bulka.java.libs.brul.utils.LoremIpsumGenerator;
 import com.bulka.java.libs.brul.utils.TextUtils;
 
@@ -9,33 +13,33 @@ import java.awt.*;
 import java.util.logging.Logger;
 
 public class DevMenu {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private String text = "";
     private Color color = Color.WHITE;
     private int fontSize = 14;
     private boolean show = false;
 
     public void init() {
-        fontSize = (int) (14 * Engine.getEngine().getSettingsManager().getFloat("game.graphics.ui.scale", 1f));
+        fontSize = (int) (14 * SettingsManager.getSelf().getFloat("game.graphics.ui.scale", 1f));
     }
 
     public void postInit() {
     }
 
     public void update() {
-        if (Engine.getEngine().getInputManager().isKeyTypedClicked(Engine.getEngine().getGame().getControls().devMenu))
+        if (InputManager.getSelf().isKeyTypedClicked(Controls.getSelf().devMenu))
             show = !show;
         if (show) {
             text = TextUtils.format("JMine $\nFPS: $\nHero: x:$; y:$; z:$, p:$; y:$", Engine.VERSION,
                     Engine.getEngine().getFPS(),
-                    Engine.getEngine().getGame().getHero().getPosition().x, Engine.getEngine().getGame().getHero().getPosition().y, Engine.getEngine().getGame().getHero().getPosition().z, Engine.getEngine().getGame().getHero().getRotation().x, Engine.getEngine().getGame().getHero().getRotation().y
+                    Hero.getSelf().getPosition().x, Hero.getSelf().getPosition().y, Hero.getSelf().getPosition().z, Hero.getSelf().getRotation().x, Hero.getSelf().getRotation().y
             );
         }
     }
 
     public void render() {
         if (show) {
-            Engine.getEngine().getTextRenderer().render(text, 0, 0, fontSize, color);
+            TextRendererGL.getSelf().render(text, 0, 0, fontSize, color);
         }
     }
 
@@ -69,5 +73,9 @@ public class DevMenu {
 
     public String getText() {
         return text;
+    }
+
+    public static DevMenu getSelf(){
+        return Engine.getEngine().getGame().getDevMenu();
     }
 }

@@ -13,7 +13,7 @@ import org.joml.Vector3f;
 import java.util.logging.Logger;
 
 public class Game {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private GameObject testGameObject;
     private Hero hero;
     private Controls controls;
@@ -108,5 +108,13 @@ public class Game {
 
     public Controls getControls() {
         return controls;
+    }
+
+    public DevMenu getDevMenu() {
+        return devMenu;
+    }
+
+    public static Game getSelf(){
+        return Engine.getEngine().getGame();
     }
 }

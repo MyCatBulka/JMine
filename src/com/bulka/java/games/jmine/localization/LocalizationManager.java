@@ -1,6 +1,7 @@
 package com.bulka.java.games.jmine.localization;
 
 import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.settings.SettingsManager;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -8,10 +9,10 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class LocalizationManager {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ResourceBundle bundle;
     private Locale locale;
-    private String baseName = "localization/game";
+    private final String baseName = "localization/game";
     public static final ResourceBundle.Control UTF8_CONTROL = new UTF8Control();
 
     public LocalizationManager(){
@@ -19,8 +20,8 @@ public class LocalizationManager {
     }
 
     public void load(){
-        if(Engine.getEngine().getSettingsManager().get("game.language") != null) {
-            locale = new Locale(Engine.getEngine().getSettingsManager().get("game.language"));
+        if(SettingsManager.getSelf().get("game.language") != null) {
+            locale = new Locale(SettingsManager.getSelf().get("game.language"));
         }
         else {
             locale = Locale.getDefault();
@@ -65,5 +66,9 @@ public class LocalizationManager {
 
     public void destroy(){
 
+    }
+
+    public static LocalizationManager getSelf(){
+        return Engine.getEngine().getLocalizationManager();
     }
 }

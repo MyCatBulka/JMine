@@ -2,38 +2,37 @@ package com.bulka.java.games.jmine.engine.graphics.render;
 
 import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
+import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.graphics.textures.FontTexture;
+import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 import java.awt.*;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 public class TextRendererGL {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private Shader textShader;
 
     public static final String charset = " ()[]{}<>/\\|.,!@#$%^&*-+`:;№'\"_=?~0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯЇІЄабвгдеёжзийклмнопрстуфхцчшщъыьэюяїіє—«»Ґґ";
-//    private String fontName = "Courier new";
     private Map<Integer, FontTexture> fontSizes;
 
     public void load() {
         fontSizes = new HashMap<>();
-        textShader = Engine.getEngine().getShaderManager().getTextShader();
+        textShader = ShaderManager.getSelf().getTextShader();
         getFontTexture(14);
     }
 
     public void render(String text, int x, int y, int size, Color color) {
         FontTexture fontTexture = getFontTexture(size);
         int charHeight = fontTexture.getCharHeight();
-        int charWidthArray[] = fontTexture.getCharWidths();
+        int[] charWidthArray = fontTexture.getCharWidths();
         float[] bounds = fontTexture.getCharFloatBounds();
 
         textShader.bind();
@@ -141,12 +140,16 @@ public class TextRendererGL {
         FontTexture fontTexture = fontSizes.get(fontSize);
         if (fontTexture == null) {
             fontTexture = new FontTexture();
-            fontTexture.load(new Font(Engine.getEngine().getSettingsManager().get("game.graphics.ui.font", "Arial"), Engine.getEngine().getSettingsManager().getInt("game.graphics.ui.font_type", Font.PLAIN), fontSize));
+            fontTexture.load(new Font(SettingsManager.getSelf().get("game.graphics.ui.font", "Arial"), SettingsManager.getSelf().getInt("game.graphics.ui.font_type", Font.PLAIN), fontSize));
             fontSizes.put(fontSize, fontTexture);
         }
         return fontTexture;
     }
 
     public void destroy() {
+    }
+
+    public static TextRendererGL getSelf(){
+        return Engine.getEngine().getTextRenderer();
     }
 }

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 @Deprecated
 public class TextRenderer {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private long vg;
     private String fontPath;
     private NVGColor color;

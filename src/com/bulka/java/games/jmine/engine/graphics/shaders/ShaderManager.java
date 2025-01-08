@@ -1,9 +1,12 @@
 package com.bulka.java.games.jmine.engine.graphics.shaders;
 
+import com.bulka.java.games.jmine.engine.Engine;
+import com.bulka.java.games.jmine.engine.ILogic;
+
 import java.util.logging.Logger;
 
-public class ShaderManager {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+public class ShaderManager implements ILogic {
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private Shader testShader;
     private Shader textShader;
 
@@ -22,12 +25,18 @@ public class ShaderManager {
         return textShader;
     }
 
+    public Shader getTestShader() {
+        return testShader;
+    }
+
+    @Override
     public void destroy(){
         testShader.destroy();
         textShader.destroy();
     }
 
-    public Shader getTestShader() {
-        return testShader;
+
+    public static ShaderManager getSelf() {
+        return Engine.getEngine().getShaderManager();
     }
 }

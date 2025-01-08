@@ -1,13 +1,13 @@
 package com.bulka.java.games.jmine.engine;
 
 
-import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.render.TextRendererGL;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
+import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.io.InputManager;
-import com.bulka.java.games.jmine.engine.utils.GLUtils;
 import com.bulka.java.games.jmine.engine.io.Window;
+import com.bulka.java.games.jmine.engine.utils.GLUtils;
 import com.bulka.java.games.jmine.game.Game;
 import com.bulka.java.games.jmine.launcher.Main;
 import com.bulka.java.games.jmine.localization.LocalizationManager;
@@ -21,8 +21,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Engine {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+public class Engine implements Runnable{
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     public static final String VERSION = "0.0.1a";
     private InputManager inputManager;
@@ -48,8 +48,7 @@ public class Engine {
     private double renderTime;
 
 
-
-    public void start() {
+    public void run() {
         try {
             logger.info("Starting engine");
 
@@ -149,7 +148,7 @@ public class Engine {
 
     }
 
-    private void postInit(){
+    private void postInit() {
         window.postInit();
         game.postInit();
     }
@@ -214,14 +213,14 @@ public class Engine {
                 FPS = FPSCounter * FPS_CHANGING_IN_SECONDS;
                 FPSTime = System.currentTimeMillis();
                 FPSCounter = 0;
-                window.setTitle(Engine.getEngine().getWindow().getBasicTitle() + "; FPS: " + FPS);
+                window.setTitle(window.getBasicTitle() + "; FPS: " + FPS);
 //                System.out.println(String.format(Locale.US, "FPS: %d; deltaTime: %f; updateTime: %f; renderTime: %f", FPS, deltaTime, updateTime, renderTime));
             }
         }
         exit(0);
     }
 
-    public int checkErrorsGL(){
+    public int checkErrorsGL() {
         int error = GL11.glGetError();
         if (error != GL11.GL_NO_ERROR)
             return error;
@@ -229,9 +228,9 @@ public class Engine {
             return 0;
     }
 
-    public void printErrorsGL(){
+    public void printErrorsGL() {
         int error = checkErrorsGL();
-        if(error != 0) {
+        if (error != 0) {
             String errorMessage = GLUtils.getErrorMessage(error);
             logger.severe("Got OpenGL error " + error + ": " + errorMessage);
         }
@@ -296,7 +295,7 @@ public class Engine {
 
     public void destroy() {
         logger.info("Destroying");
-        if(window != null)
+        if (window != null)
             window.destroy();
         if (inputManager != null)
             inputManager.destroy();

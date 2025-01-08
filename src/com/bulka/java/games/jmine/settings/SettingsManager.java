@@ -1,5 +1,7 @@
 package com.bulka.java.games.jmine.settings;
 
+import com.bulka.java.games.jmine.engine.Engine;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,9 +11,9 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 public class SettingsManager {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
-    private Properties properties;
-    private Properties standardProperties;
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Properties properties;
+    private final Properties standardProperties;
     public static final String outPath = "settings.properties";
     public static final String inPath = "/settings/settings.properties";
 
@@ -105,5 +107,9 @@ public class SettingsManager {
     }
 
     public void destroy(){
+    }
+
+    public static SettingsManager getSelf(){
+        return Engine.getEngine().getSettingsManager();
     }
 }

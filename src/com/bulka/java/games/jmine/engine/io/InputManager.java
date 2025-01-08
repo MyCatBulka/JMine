@@ -6,11 +6,11 @@ import org.lwjgl.glfw.*;
 import java.util.Arrays;
 
 public class InputManager {
-    private boolean[] keys = new boolean[GLFW.GLFW_KEY_LAST];
-    private boolean[] buttons = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST];
+    private final boolean[] keys = new boolean[GLFW.GLFW_KEY_LAST];
+    private final boolean[] buttons = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST];
 
-    private boolean[] typedKeys = new boolean[GLFW.GLFW_KEY_LAST];
-    private boolean[] releasedKeys = new boolean[GLFW.GLFW_KEY_LAST];
+    private final boolean[] typedKeys = new boolean[GLFW.GLFW_KEY_LAST];
+    private final boolean[] releasedKeys = new boolean[GLFW.GLFW_KEY_LAST];
 
     private double mouseX = 0;
     private double mouseY = 0;
@@ -23,11 +23,11 @@ public class InputManager {
 
     private boolean isInWindow = false;
 
-    private GLFWKeyCallback keyboard;
-    private GLFWCursorPosCallback mouseMove;
-    private GLFWMouseButtonCallback mouseButtons;
-    private GLFWCursorEnterCallback enterCallback;
-    private GLFWScrollCallback mouseScroll;
+    private final GLFWKeyCallback keyboard;
+    private final GLFWCursorPosCallback mouseMove;
+    private final GLFWMouseButtonCallback mouseButtons;
+    private final GLFWCursorEnterCallback enterCallback;
+    private final GLFWScrollCallback mouseScroll;
 
     public InputManager() {
         keyboard = new GLFWKeyCallback() {
@@ -72,11 +72,11 @@ public class InputManager {
     }
 
     public void init() {
-        GLFW.glfwSetKeyCallback(Engine.getEngine().getWindow().getWindow(), keyboard);
-        GLFW.glfwSetCursorPosCallback(Engine.getEngine().getWindow().getWindow(), mouseMove);
-        GLFW.glfwSetMouseButtonCallback(Engine.getEngine().getWindow().getWindow(), mouseButtons);
-        GLFW.glfwSetScrollCallback(Engine.getEngine().getWindow().getWindow(), mouseScroll);
-        GLFW.glfwSetCursorEnterCallback(Engine.getEngine().getWindow().getWindow(), enterCallback);
+        GLFW.glfwSetKeyCallback(Window.getSelf().getWindow(), keyboard);
+        GLFW.glfwSetCursorPosCallback(Window.getSelf().getWindow(), mouseMove);
+        GLFW.glfwSetMouseButtonCallback(Window.getSelf().getWindow(), mouseButtons);
+        GLFW.glfwSetScrollCallback(Window.getSelf().getWindow(), mouseScroll);
+        GLFW.glfwSetCursorEnterCallback(Window.getSelf().getWindow(), enterCallback);
     }
 
     public void update() {
@@ -114,11 +114,11 @@ public class InputManager {
     public void setCursorPos(int x, int y) {
         mouseX = x;
         mouseY = y;
-        GLFW.glfwSetCursorPos(Engine.getEngine().getWindow().getWindow(), x, y);
+        GLFW.glfwSetCursorPos(Window.getSelf().getWindow(), x, y);
     }
 
     public void setCursorPosInCenter() {
-        setCursorPos(Engine.getEngine().getWindow().getWidth() / 2, Engine.getEngine().getWindow().getHeight() / 2);
+        setCursorPos(Window.getSelf().getWidth() / 2, Window.getSelf().getHeight() / 2);
     }
 
     public void destroy() {
@@ -200,5 +200,7 @@ public class InputManager {
         return enterCallback;
     }
 
-
+    public static InputManager getSelf(){
+        return Engine.getEngine().getInputManager();
+    }
 }

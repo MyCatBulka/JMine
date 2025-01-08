@@ -1,5 +1,6 @@
 package com.bulka.java.games.jmine.engine.graphics.render;
 
+import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.graphics.objects.GameObject;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -10,7 +11,7 @@ import org.lwjgl.opengl.GL30;
 import java.util.logging.Logger;
 
 public class BasicRenderer {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     public void init(){
 
@@ -54,6 +55,10 @@ public class BasicRenderer {
         GL30.glDisableVertexAttribArray(0);
         GL30.glDisableVertexAttribArray(1);
         GL30.glBindVertexArray(0);
+    }
+
+    public static BasicRenderer getSelf(){
+        return Engine.getEngine().getBasicRenderer();
     }
 
 }
