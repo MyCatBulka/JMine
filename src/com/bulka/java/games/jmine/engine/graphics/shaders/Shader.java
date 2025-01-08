@@ -4,6 +4,7 @@ import com.bulka.java.games.jmine.engine.utils.GameFileUtils;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.system.MemoryUtil;
@@ -112,6 +113,10 @@ public class Shader {
     public void setUniform(String name, Vector3f value){
         if(successful)
             GL20.glUniform3f(getUniformLocation(name), value.x, value.y, value.z);
+    }
+    public void setUniform(String name, Vector4f value){
+        if(successful)
+            GL20.glUniform4f(getUniformLocation(name), value.x, value.y, value.z, value.w);
     }
     public void setUniform(String name, boolean value){
         if(successful)

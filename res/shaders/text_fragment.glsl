@@ -8,5 +8,5 @@ uniform vec4 textColor;
 
 void main() {
     float c = texture(fontTexture, texCoord).r;
-    fragColor = r * textColor;
+    fragColor = vec4(c * textColor.r, c * textColor.g, c * textColor.b, c * textColor.a);
 }

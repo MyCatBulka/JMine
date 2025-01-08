@@ -40,13 +40,27 @@ public class Game {
                 0, 1, 2,
                 2, 3, 0
         }), new Texture());
+//        testGameObject2 = new GameObject(new Mesh(new Vertex[]{
+//                new Vertex(-size, -size, 0, 0.0f, 1.0f),
+//                new Vertex(size, -size, 0, 1.0f, 1.0f),
+//                new Vertex(size, size, 0, 1.0f, 0.0f),
+//                new Vertex(-size, size, 0, 0.0f, 0.0f),
+//        }, new int[]{
+//                0, 1, 2,
+//                2, 3, 0
+//        }), new Texture());
         testGameObject.setModelMatrix(new Matrix4f());
         testGameObject.getModelMatrix().translate(new Vector3f(0, 0, 0));
         testGameObject.postInit();
+//        testGameObject2.setModelMatrix(new Matrix4f());
+//        testGameObject2.getModelMatrix().translate(new Vector3f(1, 0, 0));
+//        testGameObject2.postInit();
         logger.info("Creating mesh");
+//        testGameObject2.getMesh().create();
         testGameObject.getMesh().create();
         logger.info("Created mesh");
         logger.info("Loading test material");
+//        testGameObject2.getTexture().load("/textures/items/apple.png");
         testGameObject.getTexture().load("/textures/items/apple.png");
         logger.info("Loaded test material");
 
@@ -66,6 +80,9 @@ public class Game {
     public void postInit(){
         hero.postInit();
         devMenu.postInit();
+
+//        testGameObject2.getTexture().setTextureID(Engine.getEngine().getTextRenderer().getFontTexture(20).getTextureID());
+//        testGameObject.getTexture().setTextureID(Engine.getEngine().getTextRenderer().getFontTexture(20).getTextureID());
     }
 
     public void preUpdate(){
@@ -83,6 +100,7 @@ public class Game {
 
     public void render(){
         testGameObject.render();
+//        testGameObject2.render();
         hero.render();
         devMenu.render();
 //        BasicRenderer.renderMesh(testGameObject.getMesh(), testGameObject.getShader(), testGameObject.getMaterial(), null);
@@ -90,6 +108,8 @@ public class Game {
 
     public void destroy(){
         testGameObject.destroy();
+//        testGameObject2.destroy();
+
         controls.destroy();
     }
 

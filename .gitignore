@@ -27,3 +27,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/logs/JMine_log0.0.log

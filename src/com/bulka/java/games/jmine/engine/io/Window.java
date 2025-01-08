@@ -113,7 +113,9 @@ public class Window {
 
     private void updateOrthoMatrix() {
         orthoMatrix = new Matrix4f().ortho2D(0, width, height, 0);
+        Engine.getEngine().getShaderManager().getTextShader().bind();
         Engine.getEngine().getShaderManager().getTextShader().setUniform("orthoProj", orthoMatrix);
+        Engine.getEngine().getShaderManager().getTextShader().unBind();
     }
 
     public void updateProjectionMatrix(){
