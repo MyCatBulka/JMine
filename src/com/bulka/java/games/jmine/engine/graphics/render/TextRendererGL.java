@@ -4,6 +4,7 @@ import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.graphics.textures.FontTexture;
+import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
@@ -29,7 +30,7 @@ public class TextRendererGL {
         getFontTexture(14);
     }
 
-    public void render(String text, int x, int y, int size, Color color, Color bg) {
+    public void render(String text, float x, float y, boolean normalizedCoords, boolean alignLeft, boolean alignTop, int size, Color color, Color bg) {
         FontTexture fontTexture = getFontTexture(size);
         int charHeight = fontTexture.getCharHeight();
         int[] charWidthArray = fontTexture.getCharWidths();
@@ -58,11 +59,43 @@ public class TextRendererGL {
         int[] indices = new int[maxIndices];
 
         int vertexIndex = 0, indexIndex = 0, globalIndex = 0;
-        int startY = y;
+
+        int windowWidth = Window.getSelf().getWidth();
+        int windowHeight = Window.getSelf().getHeight();
+
+        if (normalizedCoords) {
+            x = (x + 1) / 2 * windowWidth;
+            y = (1 - y) / 2 * windowHeight;
+        }
+
+        int textWidth = 0;
+        int numLines = 0;
+        for (int i = 0, lineWidth = 0; i <= text.length(); i++) {
+            if (i == text.length() || text.charAt(i) == '\n') {
+                textWidth = Math.max(textWidth, lineWidth);
+                lineWidth = 0;
+                numLines++;
+            } else {
+                char c = text.charAt(i);
+                int chNumber = charset.indexOf(c);
+                if (chNumber == -1) chNumber = charset.indexOf('?');
+                lineWidth += charWidthArray[chNumber];
+            }
+        }
+        int textHeight = numLines * charHeight;
+
+        if (!alignLeft) {
+            x = windowWidth - x - textWidth;
+        }
+        if (!alignTop) {
+            y = windowHeight - y - textHeight;
+        }
+
+        int startY = Math.round(y);
 
         for (int i = 0, lineStart = 0; i <= text.length(); i++) {
             if (i == text.length() || text.charAt(i) == '\n') {
-                int startX = x;
+                int startX = Math.round(x);
                 for (int j = lineStart; j < i; j++) {
                     char c = text.charAt(j);
                     int chNumber = charset.indexOf(c);

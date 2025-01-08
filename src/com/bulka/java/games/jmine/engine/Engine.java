@@ -65,7 +65,6 @@ public class Engine implements Runnable{
             }
             logger.info("Initialized GLFW");
 
-//            Texture.init();
 
             logger.info("Initializing Settings Manager");
             settingsManager = new SettingsManager();

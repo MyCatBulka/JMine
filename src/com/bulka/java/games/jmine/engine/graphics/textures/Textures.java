@@ -18,7 +18,8 @@ import java.util.logging.Logger;
 public class Textures implements ILogic {
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private Map<String, Integer> textures;
-    public static BufferedImage emptyTexture;
+    private static BufferedImage emptyTexture;
+    private static int emptyTextureID;
     static {
         int width = 16;
         int height = 16;
@@ -39,6 +40,8 @@ public class Textures implements ILogic {
     @Override
     public void init() {
         textures = new HashMap<>();
+        emptyTextureID = loadTexture(emptyTexture);
+        textures.put("empty", emptyTextureID);
     }
 
     public int getTexture(String path){
@@ -61,10 +64,8 @@ public class Textures implements ILogic {
                 texture = loadTexture(image);
                 logger.config("Successful created texture: " + path);
             } catch (Exception e) {
-                logger.warning("Can`t load image: " + path);
-                image = emptyTexture;
-                texture = loadTexture(image);
-                logger.config("Successful created standard texture: " + path);
+                logger.warning("Can`t load image, setting standard empty texture: " + path);
+                texture = emptyTextureID;
             }
 
         } catch (Exception e) {
@@ -108,6 +109,14 @@ public class Textures implements ILogic {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
         return textureID;
+    }
+
+    public static int getEmptyTextureID() {
+        return emptyTextureID;
+    }
+
+    public static BufferedImage getEmptyTexture() {
+        return emptyTexture;
     }
 
     @Override

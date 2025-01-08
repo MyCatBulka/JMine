@@ -36,8 +36,7 @@ public class Texture {
                 logger.config("Successful created texture: " + path);
             } catch (Exception e) {
                 logger.warning("Can`t load image: " + path);
-                image = Textures.emptyTexture;
-                load(image);
+                textureID = Textures.getEmptyTextureID();
                 logger.config("Successful created standard texture: " + path);
             }
 

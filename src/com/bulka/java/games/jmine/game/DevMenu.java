@@ -7,6 +7,7 @@ import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.game.client.contorls.Controls;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import com.bulka.java.libs.brul.utils.TextUtils;
+import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
 import java.util.Locale;
@@ -22,6 +23,10 @@ public class DevMenu {
     private double deltaTime;
     private double updateTime;
     private double renderTime;
+    private int allocated;
+    private int used;
+    private int free;
+    private int maxMemory;
 
     public void init() {
         fontSize = (int) (14 * SettingsManager.getSelf().getFloat("game.graphics.ui.scale", 1f));
@@ -36,10 +41,11 @@ public class DevMenu {
             show = !show;
         if (show) {
             text = String.format(Locale.US,
-                    "JMine %s\nFPS: %s\nDelta time: %.4fms, Update: %.4fms, Render: %.4fms\nHero: x:%.3f; y:%.3f; z:%.3f, p:%.1f; y:%.1f",
+                    "JMine %s\nFPS: %s; Time: %.1fs\nDelta time: %.4fms, Update: %.4fms, Render: %.4fms\nMemory Allocated: %dMB; Used: %dMB; Free: %dMB; MAX: %d\nXYZ:%.3f / %.3f / %.3f, p:%.1f; y:%.1f",
                     Engine.VERSION,
-                    Engine.getEngine().getFPS(),
+                    Engine.getEngine().getFPS(), GLFW.glfwGetTime(),
                     deltaTime, updateTime, renderTime,
+                    allocated, used, free, maxMemory,
                     Hero.getSelf().getPosition().x, Hero.getSelf().getPosition().y, Hero.getSelf().getPosition().z, Hero.getSelf().getRotation().x, Hero.getSelf().getRotation().y
 
             );
@@ -48,7 +54,7 @@ public class DevMenu {
 
     public void render() {
         if (show) {
-            TextRendererGL.getSelf().render(text, 0, 0, fontSize, color, bgColor);
+            TextRendererGL.getSelf().render(text, 0f, 0f, false, true,  true, fontSize, color, bgColor);
         }
     }
 
@@ -56,6 +62,10 @@ public class DevMenu {
         deltaTime = Engine.getEngine().getDeltaTime()*1000;
         updateTime = Engine.getEngine().getUpdateTime()*1000;
         renderTime = Engine.getEngine().getRenderTime()*1000;
+        allocated = (int)(Runtime.getRuntime().totalMemory() / 1048576);
+        free = (int)(Runtime.getRuntime().freeMemory() / 1048576);
+        maxMemory = (int)(Runtime.getRuntime().maxMemory() / 1048576);
+        used = allocated - free;
     }
 
     public void destroy() {
