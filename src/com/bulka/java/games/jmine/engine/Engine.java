@@ -125,6 +125,9 @@ public class Engine {
             logger.info("All is initialized, starting postInit");
             postInit();
             logger.info("Successful postInitialized");
+            logger.info("GC");
+            System.gc();
+            logger.info("GC");
 
             logger.info("Showing window");
             window.show(true);

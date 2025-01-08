@@ -77,8 +77,6 @@ public class FontTexture {
             totalWidth += img.getWidth();
         }
 
-//        imageWidth = (int) Math.ceil(Math.sqrt(totalWidth * charHeight));
-//        imageHeight = (int) Math.ceil((double) totalWidth / imageWidth) * charHeight;
         imageWidth = (int) Math.pow(2, Math.ceil(Math.log(Math.sqrt(totalWidth * charHeight)) / Math.log(2)));
         imageHeight = (int) Math.pow(2, Math.ceil(Math.log((double) totalWidth / imageWidth * charHeight) / Math.log(2)));
 
