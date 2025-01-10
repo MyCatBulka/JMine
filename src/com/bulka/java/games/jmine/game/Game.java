@@ -36,23 +36,23 @@ public class Game {
         devMenu.init();
         logger.info("Initialized DevMenu");
 
-        float size = 0.5f;
-        testGameObject = new GameObject(new Mesh(new Vertex[]{
-                new Vertex(-size, -size, 0, 0.0f, 1.0f),
-                new Vertex(size, -size, 0, 1.0f, 1.0f),
-                new Vertex(size, size, 0, 1.0f, 0.0f),
-                new Vertex(-size, size, 0, 0.0f, 0.0f),
-        }, new int[]{
-                2, 1, 0,
-                0, 3, 2
-        }), Textures.getSelf().getTexture("/textures/items/apple.png"));
+//        float size = 0.5f;
+//        testGameObject = new GameObject(new Mesh(new Vertex[]{
+//                new Vertex(-size, -size, 0, 0.0f, 1.0f),
+//                new Vertex(size, -size, 0, 1.0f, 1.0f),
+//                new Vertex(size, size, 0, 1.0f, 0.0f),
+//                new Vertex(-size, size, 0, 0.0f, 0.0f),
+//        }, new int[]{
+//                2, 1, 0,
+//                0, 3, 2
+//        }), Textures.getSelf().getTexture("/textures/items/apple.png"));
 
-        testGameObject.setModelMatrix(new Matrix4f());
-        testGameObject.getModelMatrix().translate(new Vector3f(0, 0, 0));
-        testGameObject.postInit();
-        logger.info("Creating mesh");
-        testGameObject.getMesh().create();
-        logger.info("Created mesh");
+//        testGameObject.setModelMatrix(new Matrix4f());
+//        testGameObject.getModelMatrix().translate(new Vector3f(0, 0, 0));
+//        testGameObject.postInit();
+//        logger.info("Creating mesh");
+//        testGameObject.getMesh().create();
+//        logger.info("Created mesh");
         logger.info("Loading test material");
         logger.info("Loaded test material");
 
@@ -104,16 +104,16 @@ public class Game {
     }
 
     public void render(){
-        testGameObject.render();
-        hero.render();
+//        testGameObject.render();
         world.render();
+        hero.render();
 
         devMenu.render();
         crosshair.render();
    }
 
     public void destroy(){
-        testGameObject.destroy();
+//        testGameObject.destroy();
         world.destroy();
         devMenu.destroy();
         controls.destroy();

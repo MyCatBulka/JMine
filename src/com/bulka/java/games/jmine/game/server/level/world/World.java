@@ -1,47 +1,48 @@
 package com.bulka.java.games.jmine.game.server.level.world;
 
-import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.game.Game;
-import com.bulka.java.games.jmine.game.server.blocks.Blocks;
 import com.bulka.java.games.jmine.game.server.level.world.chunk.Chunk;
-import com.bulka.java.games.jmine.game.server.level.world.chunk.SubChunk;
+import com.bulka.java.games.jmine.settings.SettingsManager;
 
 import java.util.Random;
 
 public class World {
-    private int width = 4;
-    private int blocksWidth = width * Chunk.WIDTH;
+    private int renderDistance = 2*2+1;
+    private int blocksWidth = renderDistance * Chunk.WIDTH;
     public Chunk[][] chunks;
 
-    public void init(){
+    public void init() {
+        renderDistance = SettingsManager.getSelf().getInt("game.graphics.render_distance", 2) * 2 + 1;
+        blocksWidth = renderDistance * Chunk.WIDTH;
         generate();
-
     }
+
     public void postInit() {
 
     }
-    public void load(){
+
+    public void load() {
 
     }
 
-    public void save(){
+    public void save() {
 
     }
 
-    public void generate(){
-        chunks = new Chunk[width][width];
+    public void generate() {
+        chunks = new Chunk[renderDistance][renderDistance];
 
-        for (int x = 0; x < width; x++) {
-            for (int z = 0; z < width; z++) {
-                Chunk chunk = new Chunk(x-width/2, z-width/2, this);
+        for (int x = 0; x < renderDistance; x++) {
+            for (int z = 0; z < renderDistance; z++) {
+                Chunk chunk = new Chunk(x - renderDistance / 2, z - renderDistance / 2, this);
                 chunks[x][z] = chunk;
                 chunks[x][z].create();
             }
         }
 
         Random random = new Random();
-        for (int x = -width*Chunk.WIDTH/2; x < blocksWidth / 2; x++) {
-            for (int z = -width*Chunk.WIDTH/2; z < blocksWidth / 2; z++) {
+        for (int x = -renderDistance * Chunk.WIDTH / 2; x < blocksWidth / 2; x++) {
+            for (int z = -renderDistance * Chunk.WIDTH / 2; z < blocksWidth / 2; z++) {
                 for (int y = 0; y < 10; y++) {
                     setBlock((short) 3, (byte) 0, x, y, z);
                 }
@@ -57,8 +58,8 @@ public class World {
 //            }
 //        }
 
-        for (int x = 0; x < width; x++) {
-            for (int z = 0; z < width; z++) {
+        for (int x = 0; x < renderDistance; x++) {
+            for (int z = 0; z < renderDistance; z++) {
                 Chunk chunk = chunks[x][z];
                 for (int y = 0; y < Chunk.NUM_SUB_CHUNKS; y++) {
                     chunk.getSubChunk(y).updateMesh();
@@ -68,68 +69,75 @@ public class World {
 
 
     }
-    public void update(){
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < width; y++) {
+
+    public void update() {
+        for (int x = 0; x < renderDistance; x++) {
+            for (int y = 0; y < renderDistance; y++) {
                 chunks[x][y].update();
             }
         }
     }
-    public void render(){
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < width; y++) {
+
+    public void render() {
+        for (int x = 0; x < renderDistance; x++) {
+            for (int y = 0; y < renderDistance; y++) {
                 chunks[x][y].render();
             }
         }
     }
-    public void destroy(){
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < width; y++) {
+
+    public void destroy() {
+        for (int x = 0; x < renderDistance; x++) {
+            for (int y = 0; y < renderDistance; y++) {
                 chunks[x][y].destroy();
             }
         }
     }
 
-    public short getBlock(int x, int y, int z){
-        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+    public short getBlock(int x, int y, int z) {
+        if (x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
             return -1;
-        return chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].getBlock(Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+        return chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].getBlock((x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
     }
-    public short getBlockID(int x, int y, int z){
-        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+
+    public short getBlockID(int x, int y, int z) {
+        if (x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
             return -1;
-        return chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].getBlockID(Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+        return chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].getBlockID((x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
     }
-    public short getBlockState(int x, int y, int z){
-        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+
+    public short getBlockState(int x, int y, int z) {
+        if (x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
             return -1;
-       return chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].getBlockState(Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+        return chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].getBlockState((x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
     }
-    public void setBlock(short id, byte state, int x, int y, int z){
-        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+
+    public void setBlock(short id, byte state, int x, int y, int z) {
+        if (x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
             return;
-        chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].setBlock(id, state,  Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+        chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].setBlock(id, state, (x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
     }
 
-    public int getWidth() {
-        return width;
+    public int getRenderDistance() {
+        return renderDistance;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-        blocksWidth = width * Chunk.WIDTH;
+    public void setRenderDistance(int renderDistance) {
+        this.renderDistance = renderDistance;
+        blocksWidth = renderDistance * Chunk.WIDTH;
     }
+
     public Chunk getChunk(int x, int z) {
-        if(x < -width/2 || x >= width/2 || z < -width/2 || z >= width/2)
+        if (x < -renderDistance / 2 || x >= renderDistance / 2 || z < -renderDistance / 2 || z >= renderDistance / 2)
             return null;
-        return chunks[x+width/2][z+width/2];
+        return chunks[x + renderDistance / 2][z + renderDistance / 2];
     }
 
     public Chunk[][] getChunks() {
         return chunks;
     }
 
-    public static World getSelf(){
+    public static World getSelf() {
         return Game.getSelf().getWorld();
     }
 
