@@ -3,6 +3,8 @@ package com.bulka.java.games.jmine.engine.graphics.camera;
 import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.game.client.contorls.Controls;
+import com.bulka.java.games.jmine.game.server.level.world.WorldProvider;
+import com.bulka.java.games.jmine.game.server.level.world.chunk.Chunk;
 import org.joml.Vector3f;
 
 import java.util.logging.Logger;
@@ -81,7 +83,29 @@ public class Hero {
             changed = true;
         }
 
+
+
         if(changed){
+//            int moveChunksX = 0;
+//            int moveChunksZ = 0;
+//            if(position.x >= Chunk.WIDTH){
+//                position.x = position.x - Chunk.WIDTH;
+//                moveChunksX = 1;
+//            }
+//            else if(position.x < 0){
+//                position.x = -position.x;
+//                moveChunksX = -1;
+//            }
+//            else if(position.z >= Chunk.WIDTH){
+//                position.z = position.z - Chunk.WIDTH;
+//                moveChunksZ = 1;
+//            }
+//            else if(position.z < 0){
+//                position.z = -position.z;
+//                moveChunksZ = -1;
+//            }
+//
+//            WorldProvider.getSelf().moveChunks(moveChunksX, moveChunksZ);
             camera.setPos(position);
             camera.setRot(rotation);
             camera.updateViewMatrix();

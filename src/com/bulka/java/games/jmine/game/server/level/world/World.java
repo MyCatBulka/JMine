@@ -4,15 +4,14 @@ import com.bulka.java.games.jmine.game.Game;
 import com.bulka.java.games.jmine.game.server.level.world.chunk.Chunk;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 
-import java.util.Random;
 
 public class World {
-    private int renderDistance = 2*2;
+    private int renderDistance = 2 * 2 + 1;
     private int blocksWidth = renderDistance * Chunk.WIDTH;
     public Chunk[][] chunks;
 
     public void init() {
-        renderDistance = SettingsManager.getSelf().getInt("game.graphics.render_distance", 2) * 2;
+        renderDistance = SettingsManager.getSelf().getInt("game.graphics.render_distance", 2) * 2 + 1;
         blocksWidth = renderDistance * Chunk.WIDTH;
         generate();
     }
@@ -91,12 +90,16 @@ public class World {
         blocksWidth = renderDistance * Chunk.WIDTH;
     }
 
-    public Chunk getChunk(int x, int z) {
-        if (x < -renderDistance / 2 || x >= renderDistance / 2 || z < -renderDistance / 2 || z >= renderDistance / 2)
-            return null;
-        return chunks[x + renderDistance / 2][z + renderDistance / 2];
-    }
+    public Chunk getChunk(int chunkX, int chunkZ) {
+        int indexX = chunkX + renderDistance / 2;
+        int indexZ = chunkZ + renderDistance / 2;
 
+        if (indexX < 0 || indexX >= renderDistance || indexZ < 0 || indexZ >= renderDistance) {
+            return null;
+        }
+
+        return chunks[indexX][indexZ];
+    }
     public Chunk[][] getChunks() {
         return chunks;
     }

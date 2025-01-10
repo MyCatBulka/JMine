@@ -118,7 +118,11 @@ public class SubChunk {
                                 short neighbourBlockNum = neighbourSubChunk.blocks[neighbourIndex];
                                 short neighbourBlockID = (short) ((neighbourBlockNum >>> 4) & 0x0FFF);
                                 alphaNeighbours[side] = Blocks.getSelf().getBlock(neighbourBlockID).hasAlfa;
+                            } else {
+                                alphaNeighbours[side] = true;
                             }
+                        } else {
+                            alphaNeighbours[side] = true;
                         }
                     }
 

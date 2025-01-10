@@ -40,15 +40,6 @@ public class WorldProvider {
             }
         }
 
-        Random random = new Random();
-//        for (int x = -renderDistance * Chunk.WIDTH / 2; x < world.getBlocksWidth() / 2; x++) {
-//            for (int z = -renderDistance * Chunk.WIDTH / 2; z < world.getBlocksWidth() / 2; z++) {
-//                for (int y = 0; y < 10; y++) {
-//                    world.setBlock((short) 3, (byte) 0, x, y, z);
-//                }
-//            }
-//        }
-
         for (int x = 0; x < renderDistance; x++) {
             for (int z = 0; z < renderDistance; z++) {
                 Chunk chunk = world.chunks[x][z];
@@ -65,48 +56,64 @@ public class WorldProvider {
     }
 
     public void generateChunk(Chunk chunk) {
-        for (int x = chunk.startX; x < chunk.startX + Chunk.WIDTH; x++) {
-            for (int z = chunk.startZ; z < chunk.startZ + Chunk.WIDTH; z++) {
+        for (int x = 0; x < Chunk.WIDTH; x++) {
+            for (int z = 0; z < Chunk.WIDTH; z++) {
                 for (int y = 0; y < 10; y++) {
-                    world.setBlock((short) 3, (byte) 0, x, y, z);
+                    chunk.setBlock((short) 3, (byte) 0, x, y, z);
                 }
             }
         }
     }
 
-    public void moveChunks(int x, int z) {
-        //TODO
+//    public void moveChunks(int offsetX, int offsetZ) {
+//        if (offsetX == 0 && offsetZ == 0) {
+//            return; // Никакого смещения не требуется
+//        }
+//
 //        int renderDistance = world.getRenderDistance();
 //        Chunk[][] newChunks = new Chunk[renderDistance][renderDistance];
 //
-//        for (int i = 0; i < renderDistance; i++) {
-//            for (int j = 0; j < renderDistance; j++) {
-//                int newX = i - x;
-//                int newZ = j - z;
+//        // Сдвигаем существующие чанки
+//        for (int x = 0; x < renderDistance; x++) {
+//            for (int z = 0; z < renderDistance; z++) {
+//                int newX = x - offsetX;
+//                int newZ = z - offsetZ;
 //
+//                // Проверяем, находится ли новый индекс в пределах массива
 //                if (newX >= 0 && newX < renderDistance && newZ >= 0 && newZ < renderDistance) {
-//                    newChunks[i][j] = world.chunks[newX][newZ];
-//                } else {
-//                    int chunkStartX = (i - renderDistance / 2) * Chunk.WIDTH;
-//                    int chunkStartZ = (j - renderDistance / 2) * Chunk.WIDTH;
-//                    Chunk newChunk = new Chunk(chunkStartX, chunkStartZ, world);
-//                    newChunk.create();
-//                    generateChunk(newChunk);
-//                    newChunks[i][j] = newChunk;
+//                    newChunks[newX][newZ] = world.chunks[x][z];
 //                }
 //            }
 //        }
 //
+//        // Генерируем новые чанки для пустых мест
+//        for (int x = 0; x < renderDistance; x++) {
+//            for (int z = 0; z < renderDistance; z++) {
+//                if (newChunks[x][z] == null) {
+//                    // Рассчитываем мировые координаты нового чанка
+//                    int chunkWorldX = x - renderDistance / 2;
+//                    int chunkWorldZ = z - renderDistance / 2;
+//
+//                    Chunk newChunk = new Chunk(chunkWorldX, chunkWorldZ, world);
+//                    newChunk.create();
+//                    generateChunk(newChunk); // Генерация содержимого нового чанка
+//                    newChunks[x][z] = newChunk;
+//                }
+//            }
+//        }
+//
+//        // Заменяем старый массив чанков на новый
 //        world.chunks = newChunks;
 //
-//        for (int i = 0; i < renderDistance; i++) {
-//            for (int j = 0; j < renderDistance; j++) {
+//        // Обновляем сетку (например, рендеринг)
+//        for (int x = 0; x < renderDistance; x++) {
+//            for (int z = 0; z < renderDistance; z++) {
 //                for (int y = 0; y < Chunk.NUM_SUB_CHUNKS; y++) {
-//                    world.chunks[i][j].getSubChunk(y).updateMesh();
+//                    world.chunks[x][z].getSubChunk(y).updateMesh();
 //                }
 //            }
 //        }
-    }
+//    }
 
     public void update() {
         world.update();
