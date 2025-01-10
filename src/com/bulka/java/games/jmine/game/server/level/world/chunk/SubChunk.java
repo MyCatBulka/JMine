@@ -364,4 +364,24 @@ public class SubChunk {
     public short[] getBlocks() {
         return blocks;
     }
+
+    public int getStartBlockX() {
+        return startBlockX;
+    }
+
+    public int getStartBlockY() {
+        return startBlockY;
+    }
+
+    public int getStartBlockZ() {
+        return startBlockZ;
+    }
+
+    public Matrix4f getWorldPositionMatrix() {
+        return worldPositionMatrix;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty;
+    }
 }

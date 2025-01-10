@@ -41,6 +41,18 @@ public class Chunk {
         }
     }
 
+    public void translate(int x, int z){
+        for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
+            subChunks[i].getWorldPositionMatrix().identity();
+            subChunks[i].getWorldPositionMatrix().translate(x, 0, z);
+        }
+    }
+    public void addPosition(int x, int z){
+        for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
+            subChunks[i].getWorldPositionMatrix().translate(x, 0, z);
+        }
+    }
+
     public void update() {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].update();
@@ -56,6 +68,12 @@ public class Chunk {
     public void destroy() {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].destroy();
+        }
+    }
+
+    public void updateMeshes(){
+        for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
+            subChunks[i].updateMesh();
         }
     }
 
@@ -99,6 +117,9 @@ public class Chunk {
 
     public void setChunkX(int chunkX) {
         this.chunkX = chunkX;
+        for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
+            subChunks[i].setChunkX(chunkX);
+        }
     }
 
     public int getChunkZ() {
@@ -107,6 +128,9 @@ public class Chunk {
 
     public void setChunkZ(int chunkZ) {
         this.chunkZ = chunkZ;
+        for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
+            subChunks[i].setChunkZ(chunkZ);
+        }
     }
 
     public World getWorld() {
