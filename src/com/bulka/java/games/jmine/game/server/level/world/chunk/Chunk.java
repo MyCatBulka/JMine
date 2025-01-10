@@ -37,7 +37,7 @@ public class Chunk {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i] = new SubChunk(this, chunkX, i, chunkZ);
             subChunks[i].create();
-            subChunks[i].updateMesh();
+//            subChunks[i].updateMesh();
         }
     }
     public void update() {

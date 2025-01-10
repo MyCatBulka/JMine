@@ -9,6 +9,7 @@ import com.bulka.java.games.jmine.game.server.blocks.Face;
 import com.bulka.java.games.jmine.game.server.level.world.World;
 import com.bulka.java.games.jmine.game.server.level.world.chunk.mesh.ChunkMesh;
 import com.bulka.java.games.jmine.game.server.level.world.chunk.mesh.ChunkVertex;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
@@ -30,7 +31,10 @@ public class SubChunk {
     private int startBlockY = 0;
     private int startBlockZ = 0;
     private short[] blocks;
+    private short[] palette;
     private ChunkMesh mesh;
+    private Matrix4f worldPositionMatrix;
+    private boolean isEmpty = false;
 
     public SubChunk() {
 
@@ -58,6 +62,9 @@ public class SubChunk {
     public void create() {
         blocks = new short[WIDTH * WIDTH * HEIGHT];
         Arrays.fill(blocks, (short) 0);
+        mesh = new ChunkMesh();
+        mesh.create();
+        worldPositionMatrix = new Matrix4f();
     }
 
     public void update() {
@@ -67,6 +74,8 @@ public class SubChunk {
     public void updateMesh() {
         List<ChunkVertex> vertices = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
+        worldPositionMatrix.identity();
+        worldPositionMatrix = worldPositionMatrix.translate(startBlockX, startBlockY, startBlockZ);
         int faceIndex = 0;
         boolean[] alphaNeighbours = new boolean[6];
         for (int x = 0; x < WIDTH; x++) {
@@ -119,9 +128,9 @@ public class SubChunk {
                             Face face = block.getSide(side);
                             for (Vertex vertex : face.getFace()) {
                                 vertices.add(new ChunkVertex(
-                                        vertex.getX() + x + startBlockX,
-                                        vertex.getY() + y + startBlockY,
-                                        vertex.getZ() + z + startBlockZ,
+                                        vertex.getX() + x,
+                                        vertex.getY() + y,
+                                        vertex.getZ() + z,
                                         vertex.getU(),
                                         vertex.getV()));
                             }
@@ -138,28 +147,36 @@ public class SubChunk {
             }
         }
 
-        mesh = new ChunkMesh(vertices.toArray(new ChunkVertex[0]), indices.stream().mapToInt(i -> i).toArray());
-        mesh.create();
+        if(vertices.size() == 1) {
+            isEmpty = true;
+        } else {
+            mesh = new ChunkMesh(vertices.toArray(new ChunkVertex[0]), indices.stream().mapToInt(i -> i).toArray());
+            mesh.create();
+        }
     }
 
     public void render() {
-        //TODO
-        GL30.glBindVertexArray(mesh.getVAO());
-        GL30.glEnableVertexAttribArray(0);
-        GL30.glEnableVertexAttribArray(1);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL13.glBindTexture(GL13.GL_TEXTURE_2D, Textures.getSelf().getTexture("/textures/blocks/blocks.png"));
-        ShaderManager.getSelf().getChunkShader().bind();
-        GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getIndices().length, GL11.GL_UNSIGNED_INT, 0);
-        ShaderManager.getSelf().getChunkShader().unBind();
-        GL13.glBindTexture(GL13.GL_TEXTURE_2D, 0);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        if(!isEmpty) {
+//            long nano = System.nanoTime();
+            GL30.glBindVertexArray(mesh.getVAO());
+            GL30.glEnableVertexAttribArray(0);
+            GL30.glEnableVertexAttribArray(1);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            GL13.glBindTexture(GL13.GL_TEXTURE_2D, Textures.getSelf().getBlocksTexture());
+            ShaderManager.getSelf().getChunkShader().bind();
+            ShaderManager.getSelf().getChunkShader().setUniform("worldPosMat", worldPositionMatrix);
+//            System.out.println(System.nanoTime() - nano);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getIndices().length, GL11.GL_UNSIGNED_INT, 0);
+            ShaderManager.getSelf().getChunkShader().unBind();
+            GL13.glBindTexture(GL13.GL_TEXTURE_2D, 0);
+            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
-        GL30.glDisableVertexAttribArray(0);
-        GL30.glDisableVertexAttribArray(1);
-        GL30.glBindVertexArray(0);
+            GL30.glDisableVertexAttribArray(0);
+            GL30.glDisableVertexAttribArray(1);
+            GL30.glBindVertexArray(0);
+        }
     }
 
     public void destroy() {

@@ -14,7 +14,7 @@ import java.nio.IntBuffer;
 public class ChunkMesh {
     private ChunkVertex[] vertices;
     private int[] indices;
-    private int vao, pbo, ibo, tbo;
+    private int vao = 0, pbo = 0, ibo = 0, tbo = 0;
 
     public ChunkMesh() {
 
@@ -30,6 +30,9 @@ public class ChunkMesh {
     }
 
     public void create() {
+        if(vertices == null || indices == null){
+            return;
+        }
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
 

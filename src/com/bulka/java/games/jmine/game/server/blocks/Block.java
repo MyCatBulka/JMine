@@ -11,42 +11,43 @@ public class Block {
             new Vertex(1.0f, 1.0f, 0.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 0.0f, 0.0f, 0.0f, 0.0f),
             new Vertex(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
-    });
+    }, true);
 
     public Face front = new Face(new Vertex[]{
-            new Vertex(0.0f, 1.0f, 1.0f, 0.0f, 0.0f),
-            new Vertex(1.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+            new Vertex(0.0f, 0.0f, 1.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 0.0f, 1.0f, 0.0f, 0.0f),
-            new Vertex(0.0f, 0.0f, 1.0f, 0.0f, 0.0f)
-    });
+            new Vertex(1.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+            new Vertex(0.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+
+    }, true, true);
 
     public Face left = new Face(new Vertex[]{
-            new Vertex(0.0f, 1.0f, 0.0f, 0.0f, 0.0f),
-            new Vertex(0.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+            new Vertex(0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
             new Vertex(0.0f, 0.0f, 1.0f, 0.0f, 0.0f),
-            new Vertex(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
-    });
+            new Vertex(0.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+            new Vertex(0.0f, 1.0f, 0.0f, 0.0f, 0.0f)
+    }, true, true);
 
     public Face right = new Face(new Vertex[]{
             new Vertex(1.0f, 1.0f, 0.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 1.0f, 1.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 0.0f, 1.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 0.0f, 0.0f, 0.0f, 0.0f)
-    });
+    }, true);
 
     public Face bottom = new Face(new Vertex[]{
-            new Vertex(0.0f, 0.0f, 1.0f, 0.0f, 0.0f),
-            new Vertex(1.0f, 0.0f, 1.0f, 0.0f, 0.0f),
+            new Vertex(0.0f, 0.0f, 0.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 0.0f, 0.0f, 0.0f, 0.0f),
-            new Vertex(0.0f, 0.0f, 0.0f, 0.0f, 0.0f)
-    });
+            new Vertex(1.0f, 0.0f, 1.0f, 0.0f, 0.0f),
+            new Vertex(0.0f, 0.0f, 1.0f, 0.0f, 0.0f)
+    }, true);
 
     public Face top = new Face(new Vertex[]{
             new Vertex(0.0f, 1.0f, 1.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 1.0f, 1.0f, 0.0f, 0.0f),
             new Vertex(1.0f, 1.0f, 0.0f, 0.0f, 0.0f),
             new Vertex(0.0f, 1.0f, 0.0f, 0.0f, 0.0f)
-    });
+    }, true);
 
     public Face[] sides = {front, back, left, right, top, bottom};
 

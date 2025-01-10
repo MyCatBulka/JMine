@@ -7,9 +7,10 @@ out vec3 pos;
 out vec2 texCoords;
 
 uniform mat4 projViewMat;
+uniform mat4 worldPosMat;
 
 void main(){
-    gl_Position = projViewMat * vec4(position.x, position.y, position.z, 1.0);
+    gl_Position = projViewMat * worldPosMat * vec4(position.x, position.y, position.z, 1.0);
 
     pos = position;
     texCoords = textureCoords;

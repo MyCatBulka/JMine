@@ -21,6 +21,7 @@ public class Textures implements ILogic {
     private Map<String, Integer> textures;
     private static BufferedImage emptyTexture;
     private static int emptyTextureID;
+    private int blocksTexture;
     static {
         int width = 16;
         int height = 16;
@@ -43,6 +44,7 @@ public class Textures implements ILogic {
         textures = new HashMap<>();
         emptyTextureID = loadTexture(emptyTexture);
         textures.put("empty", emptyTextureID);
+        blocksTexture = getTexture("/textures/blocks/blocks.png");
     }
 
     public int getTexture(String path){
@@ -133,5 +135,9 @@ public class Textures implements ILogic {
 
     public static Textures getSelf(){
         return Engine.getEngine().getTextures();
+    }
+
+    public int getBlocksTexture() {
+        return blocksTexture;
     }
 }

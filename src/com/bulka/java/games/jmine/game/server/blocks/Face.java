@@ -10,6 +10,7 @@ public class Face {
     public int textureIDX = 0;
     public int textureIDY = 0;
     public boolean isFull = true;
+    public boolean invertedTexture = false;
     public Vertex[] face;
 
 
@@ -39,12 +40,37 @@ public class Face {
         this.face = face;
         this.isFull = ifFull;
     }
+    public Face(boolean ifFull, boolean invertedTexture) {
+        this.isFull = ifFull;
+        this.invertedTexture = invertedTexture;
+    }
+
+    public Face(Vertex[] face, boolean ifFull, boolean invertedTexture) {
+        this.face = face;
+        this.isFull = ifFull;
+        this.invertedTexture = invertedTexture;
+    }
+
+    public Face(int textureIDX, int textureIDY, Vertex[] face, boolean ifFull, boolean invertedTexture) {
+        this.textureIDX = textureIDX;
+        this.textureIDY = textureIDY;
+        this.face = face;
+        this.isFull = ifFull;
+        this.invertedTexture = invertedTexture;
+    }
 
     public void recalcTexture(){
-        face[0].setTextureCoords(0.015625f*(textureIDX+1), 0.015625f*(textureIDY));
-        face[1].setTextureCoords(0.015625f*(textureIDX), 0.015625f*(textureIDY));
-        face[2].setTextureCoords(0.015625f*(textureIDX), 0.015625f*(textureIDY+1));
-        face[3].setTextureCoords(0.015625f*(textureIDX+1), 0.015625f*(textureIDY+1));
+        if(invertedTexture){
+            face[0].setTextureCoords(0.015625f*(textureIDX), 0.015625f*(textureIDY+1));
+            face[1].setTextureCoords(0.015625f*(textureIDX+1), 0.015625f*(textureIDY+1));
+            face[2].setTextureCoords(0.015625f*(textureIDX+1), 0.015625f*(textureIDY));
+            face[3].setTextureCoords(0.015625f*(textureIDX), 0.015625f*(textureIDY));
+        } else {
+            face[0].setTextureCoords(0.015625f * (textureIDX + 1), 0.015625f * (textureIDY));
+            face[1].setTextureCoords(0.015625f * (textureIDX), 0.015625f * (textureIDY));
+            face[2].setTextureCoords(0.015625f * (textureIDX), 0.015625f * (textureIDY + 1));
+            face[3].setTextureCoords(0.015625f * (textureIDX + 1), 0.015625f * (textureIDY + 1));
+        }
 
     }
 
@@ -78,5 +104,13 @@ public class Face {
 
     public void setFull(boolean full) {
         isFull = full;
+    }
+
+    public boolean isInvertedTexture() {
+        return invertedTexture;
+    }
+
+    public void setInvertedTexture(boolean invertedTexture) {
+        this.invertedTexture = invertedTexture;
     }
 }
