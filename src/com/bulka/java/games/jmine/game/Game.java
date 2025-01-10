@@ -2,12 +2,13 @@ package com.bulka.java.games.jmine.game;
 
 import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.graphics.camera.Hero;
-import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Vertex;
 import com.bulka.java.games.jmine.engine.graphics.objects.GameObject;
 import com.bulka.java.games.jmine.engine.graphics.textures.Textures;
 import com.bulka.java.games.jmine.game.client.contorls.Controls;
+import com.bulka.java.games.jmine.game.server.blocks.Blocks;
+import com.bulka.java.games.jmine.game.server.level.world.World;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -19,6 +20,8 @@ public class Game {
     private Hero hero;
     private Controls controls;
     private DevMenu devMenu;
+    private Blocks blocks;
+    private World world;
 
 
     public Game() {
@@ -38,8 +41,8 @@ public class Game {
                 new Vertex(size, size, 0, 1.0f, 0.0f),
                 new Vertex(-size, size, 0, 0.0f, 0.0f),
         }, new int[]{
-                0, 1, 2,
-                2, 3, 0
+                2, 1, 0,
+                0, 3, 2
         }), Textures.getSelf().getTexture("/textures/items/apple.png"));
 
         testGameObject.setModelMatrix(new Matrix4f());
@@ -55,19 +58,28 @@ public class Game {
         controls = new Controls();
         controls.load();
         logger.info("Loaded contorls");
+        logger.info("Creating blocks");
+        blocks = new Blocks();
+        blocks.init();
+        logger.info("Created blocks");
 
 
         logger.info("Initializing Hero");
-        hero = new Hero(new Vector3f(0, 0, 5), new Vector3f(0, 0, 0));
+        hero = new Hero(new Vector3f(5, 70, 5), new Vector3f(0, 0, 0));
         hero.init();
         logger.info("Initialized Hero");
+
+        logger.info("Creating world");
+        world = new World();
+        world.init();
+        logger.info("Created world");
 
     }
 
     public void postInit(){
         hero.postInit();
         devMenu.postInit();
-
+        world.postInit();
    }
 
     public void preUpdate(){
@@ -76,6 +88,8 @@ public class Game {
 
     public void update(){
         hero.update();
+        world.update();
+
         devMenu.update();
     }
 
@@ -85,16 +99,16 @@ public class Game {
 
     public void render(){
         testGameObject.render();
-//        testGameObject2.render();
         hero.render();
+        world.render();
+
         devMenu.render();
-//        BasicRenderer.renderMesh(testGameObject.getMesh(), testGameObject.getShader(), testGameObject.getMaterial(), null);
-    }
+   }
 
     public void destroy(){
         testGameObject.destroy();
-//        testGameObject2.destroy();
-
+        world.destroy();
+        devMenu.destroy();
         controls.destroy();
     }
 
@@ -114,7 +128,15 @@ public class Game {
         return devMenu;
     }
 
+    public Blocks getBlocks() {
+        return blocks;
+    }
+
     public static Game getSelf(){
         return Engine.getEngine().getGame();
+    }
+
+    public World getWorld() {
+        return world;
     }
 }

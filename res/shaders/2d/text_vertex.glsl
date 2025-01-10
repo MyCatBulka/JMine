@@ -6,6 +6,7 @@ layout (location = 1) in vec2 aTexCoord;
 out vec2 texCoord;
 
 uniform mat4 orthoProj;
+//uniform float uiScale;
 
 void main() {
     gl_Position = orthoProj * vec4(aPos, 1.0, 1.0);

@@ -7,32 +7,40 @@ import java.util.logging.Logger;
 
 public class ShaderManager implements ILogic {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private Shader testShader;
+    private Shader Base3DShader;
     private Shader textShader;
+    private Shader chunkShader;
 
     public ShaderManager() {
 
     }
 
     public void load(){
-        testShader = new Shader();
-        testShader.create("/shaders/test_vertex.glsl", "/shaders/test_fragment.glsl");
+        Base3DShader = new Shader();
+        Base3DShader.create("/shaders/3d/3dbase_vertex.glsl", "/shaders/3d/3dbase_fragment.glsl");
         textShader = new Shader();
-        textShader.create("/shaders/text_vertex.glsl", "/shaders/text_fragment.glsl");
+        textShader.create("/shaders/2d/text_vertex.glsl", "/shaders/2d/text_fragment.glsl");
+        chunkShader = new Shader();
+        chunkShader.create("/shaders/3d/chunk/chunk_vertex.glsl", "/shaders/3d/chunk/chunk_fragment.glsl");
     }
 
     public Shader getTextShader() {
         return textShader;
     }
 
-    public Shader getTestShader() {
-        return testShader;
+    public Shader getBase3DShader() {
+        return Base3DShader;
+    }
+
+    public Shader getChunkShader() {
+        return chunkShader;
     }
 
     @Override
     public void destroy(){
-        testShader.destroy();
+        Base3DShader.destroy();
         textShader.destroy();
+        chunkShader.destroy();
     }
 
 

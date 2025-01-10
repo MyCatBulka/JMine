@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -121,6 +122,13 @@ public class Textures implements ILogic {
 
     @Override
     public void destroy() {
+        logger.config("Deleting textures");
+        Collection<Integer> values = textures.values();
+        for(int texture : values){
+            GL11.glDeleteTextures(texture);
+        }
+        logger.config("Deleted textures");
+        init();
     }
 
     public static Textures getSelf(){

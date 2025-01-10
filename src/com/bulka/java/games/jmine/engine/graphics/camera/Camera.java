@@ -1,12 +1,10 @@
 package com.bulka.java.games.jmine.engine.graphics.camera;
 
-import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public class Camera {
     private final Matrix4f projectionMatrix;
@@ -29,10 +27,12 @@ public class Camera {
     }
 
     public void updateUniforms(){
-        ShaderManager.getSelf().getTestShader().bind();
         Matrix4f result = new Matrix4f(projectionMatrix).mul(viewMatrix);
-        ShaderManager.getSelf().getTestShader().setUniform("projViewMat", result);
-        ShaderManager.getSelf().getTestShader().unBind();
+        ShaderManager.getSelf().getBase3DShader().bind();
+        ShaderManager.getSelf().getBase3DShader().setUniform("projViewMat", result);
+        ShaderManager.getSelf().getChunkShader().bind();
+        ShaderManager.getSelf().getChunkShader().setUniform("projViewMat", result);
+        ShaderManager.getSelf().getChunkShader().unBind();
     }
 
     public void updateProjectionMatrix(){

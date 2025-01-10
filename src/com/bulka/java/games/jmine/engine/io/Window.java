@@ -69,6 +69,7 @@ public class Window {
         originalWidth = width;
         originalHeight = height;
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
+//        GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, 4);
         window = GLFW.glfwCreateWindow(width, height, title, 0, 0);
         if (window == 0) {
             logger.severe("Can`t create window!!! Terminating start");
@@ -93,7 +94,6 @@ public class Window {
 
     public void postInit(){
         normalizedOrthoMatrix = new Matrix4f().ortho2D(-1, 1, -1, 1);
-        ShaderManager.getSelf().getTextShader().setUniform("normOrthoProj", normalizedOrthoMatrix);
     }
 
     public void show(boolean val) {

@@ -1,8 +1,6 @@
 package com.bulka.java.games.jmine.engine.graphics.objects;
 
-import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
-import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.mesh.Mesh;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
@@ -52,7 +50,7 @@ public class GameObject {
     }
 
     public void postInit(){
-        shader = ShaderManager.getSelf().getTestShader();
+        shader = ShaderManager.getSelf().getBase3DShader();
     }
 
     public void update(){

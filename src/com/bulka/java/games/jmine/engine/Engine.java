@@ -4,7 +4,6 @@ package com.bulka.java.games.jmine.engine;
 import com.bulka.java.games.jmine.engine.graphics.render.BasicRenderer;
 import com.bulka.java.games.jmine.engine.graphics.render.TextRendererGL;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
-import com.bulka.java.games.jmine.engine.graphics.textures.Texture;
 import com.bulka.java.games.jmine.engine.graphics.textures.Textures;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.engine.io.Window;
@@ -16,6 +15,7 @@ import com.bulka.java.games.jmine.localization.LocalizationManager;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -119,13 +119,15 @@ public class Engine implements Runnable{
             logger.info("Initialized text renderer");
 
 
-            GL11.glEnable(GL11.GL_CULL_FACE);
+//            GL11.glEnable(GL11.GL_CULL_FACE);
+//            GL11.glCullFace(GL11.GL_BACK);
+            GL11.glFrontFace(GL11.GL_CCW);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glEnable(GL11.GL_STENCIL_TEST);
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
+//            GL13.glEnable(GL13.GL_MULTISAMPLE);
 
             logger.info("All is initialized, starting postInit");
             postInit();
@@ -142,6 +144,7 @@ public class Engine implements Runnable{
             destroy();
             throw e;
         }
+
 
         try {
             logger.info("Starting main game loop");
@@ -194,6 +197,7 @@ public class Engine implements Runnable{
     }
 
     public void loop() {
+
         long timeFrameStart;
         long timeUpdateStart;
         long timeRenderStart;

@@ -9,5 +9,8 @@ uniform vec4 bgColor;
 
 void main() {
     float c = texture(fontTexture, texCoord).r;
-    fragColor = textColor*c+bgColor;
+    fragColor = textColor*c;
+    if(fragColor.a == 0){
+        fragColor = bgColor;
+    }
 }

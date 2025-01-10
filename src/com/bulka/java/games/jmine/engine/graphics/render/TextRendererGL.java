@@ -7,10 +7,7 @@ import com.bulka.java.games.jmine.engine.graphics.textures.FontTexture;
 import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.*;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -51,6 +48,8 @@ public class TextRendererGL {
         );
         textShader.setUniform("textColor", textColor);
         textShader.setUniform("bgColor", bgColor);
+//        textShader.setUniform("uiScale", SettingsManager.getSelf().getFloat("game.graphics.ui.scale", 1f));
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, fontTexture.getTextureID());
 
         int maxVertices = text.length() * 16;
@@ -95,7 +94,18 @@ public class TextRendererGL {
 
         for (int i = 0, lineStart = 0; i <= text.length(); i++) {
             if (i == text.length() || text.charAt(i) == '\n') {
-                int startX = Math.round(x);
+                // Вычисляем ширину текущей строки
+                int lineWidth = 0;
+                for (int j = lineStart; j < i; j++) {
+                    char c = text.charAt(j);
+                    int chNumber = charset.indexOf(c);
+                    if (chNumber == -1) chNumber = charset.indexOf('?');
+                    lineWidth += charWidthArray[chNumber];
+                }
+
+                // Корректируем начальную позицию X для выравнивания по правому краю
+                int startX = Math.round(alignLeft ? x : x + (textWidth - lineWidth));
+
                 for (int j = lineStart; j < i; j++) {
                     char c = text.charAt(j);
                     int chNumber = charset.indexOf(c);
