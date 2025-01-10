@@ -5,7 +5,7 @@ import com.bulka.java.games.jmine.game.server.level.world.World;
 public class Chunk {
     public static final int WIDTH = 16;
     public static final int NUM_SUB_CHUNKS = 8;
-    public static final int HEIGHT = WIDTH*NUM_SUB_CHUNKS;
+    public static final int HEIGHT = WIDTH * NUM_SUB_CHUNKS;
     public World world;
     public int chunkX = 0;
     public int chunkZ = 0;
@@ -32,7 +32,7 @@ public class Chunk {
         startZ = chunkZ * WIDTH;
     }
 
-    public void create(){
+    public void create() {
         subChunks = new SubChunk[NUM_SUB_CHUNKS];
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i] = new SubChunk(this, chunkX, i, chunkZ);
@@ -40,30 +40,55 @@ public class Chunk {
 //            subChunks[i].updateMesh();
         }
     }
+
     public void update() {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].update();
         }
     }
+
     public void render() {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].render();
         }
     }
 
-    public void destroy(){
+    public void destroy() {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].destroy();
         }
     }
 
-    public SubChunk getSubChunk(int y){
-        if(y < 0 || y >= NUM_SUB_CHUNKS)
+    public short getBlock(int x, int y, int z) {
+        if (y < 0 || y > HEIGHT)
+            return -1;
+        return subChunks[(int) y / SubChunk.HEIGHT].getBlock(x, y % SubChunk.HEIGHT, z);
+    }
+    public short getBlockID(int x, int y, int z) {
+        if (y < 0 || y > HEIGHT)
+            return -1;
+        return subChunks[(int) y / SubChunk.HEIGHT].getBlockId(x, y % SubChunk.HEIGHT, z);
+    }
+    public short getBlockState(int x, int y, int z) {
+        if (y < 0 || y > HEIGHT)
+            return -1;
+        return subChunks[(int) y / SubChunk.HEIGHT].getBlockState(x, y % SubChunk.HEIGHT, z);
+    }
+
+    public void setBlock(short id, byte state, int x, int y, int z) {
+        if (y < 0 || y > HEIGHT)
+            return;
+        subChunks[(int) y / SubChunk.HEIGHT].setBlock(id, state, x, y % SubChunk.HEIGHT, z);
+    }
+
+    public SubChunk getSubChunk(int y) {
+        if (y < 0 || y >= NUM_SUB_CHUNKS)
             return null;
         return subChunks[y];
     }
-    public SubChunk getSubChunkChecked(int y){
-        if(y < 0 || y > NUM_SUB_CHUNKS)
+
+    public SubChunk getSubChunkChecked(int y) {
+        if (y < 0 || y > NUM_SUB_CHUNKS)
             throw new IllegalArgumentException("SubChunk out of bounds (" + y + ")");
         return subChunks[y];
     }

@@ -33,36 +33,29 @@ public class World {
 
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < width; z++) {
-                Chunk chunk = new Chunk(x, z, this);
+                Chunk chunk = new Chunk(x-width/2, z-width/2, this);
                 chunks[x][z] = chunk;
                 chunks[x][z].create();
             }
         }
 
         Random random = new Random();
-        for (int x = 0; x < blocksWidth; x++) {
-            for (int z = 0; z < blocksWidth; z++) {
-                Chunk chunk = chunks[(int) x/Chunk.WIDTH][(int) z/Chunk.WIDTH];
-                for (int y = 0; y < 64; y++) {
-                    SubChunk subChunk = chunk.getSubChunk((int)y/SubChunk.HEIGHT);
-//                    if(y < 60){
-//                        subChunk.setBlock((short) Blocks.getSelf().getBlock(1).getId(), (byte) 0, x%Chunk.WIDTH, y%SubChunk.HEIGHT, z%Chunk.WIDTH);
-//                    }
-//                    if(y >= 60 && y < 63){
-//                        subChunk.setBlock((short) Blocks.getSelf().getBlock(2).getId(), (byte) 0, x%Chunk.WIDTH, y%SubChunk.HEIGHT, z%Chunk.WIDTH);
-//                    }
-//                    if(y == 63){
-//                        subChunk.setBlock((short) Blocks.getSelf().getBlock(3).getId(), (byte) 0, x%Chunk.WIDTH, y%SubChunk.HEIGHT, z%Chunk.WIDTH);
-//                    }
-                    if(random.nextInt(10)==0){
-                        chunk.getSubChunk((int)y/SubChunk.HEIGHT).setBlock((short) Blocks.getSelf().getBlock(3).getId(), (byte) 0, x%Chunk.WIDTH, y%SubChunk.HEIGHT, z%Chunk.WIDTH);
-                    }
+        for (int x = -width*Chunk.WIDTH/2; x < blocksWidth / 2; x++) {
+            for (int z = -width*Chunk.WIDTH/2; z < blocksWidth / 2; z++) {
+                for (int y = 0; y < 10; y++) {
+                    setBlock((short) 3, (byte) 0, x, y, z);
                 }
-//                if(random.nextInt(2)==0){
-//                    chunk.getSubChunk((int)64/SubChunk.HEIGHT).setBlock((short) Blocks.getSelf().getBlock(3).getId(), (byte) 0, x%Chunk.WIDTH, 64%SubChunk.HEIGHT, z%Chunk.WIDTH);
-//                }
             }
         }
+//        for (int x = -width*Chunk.WIDTH/2; x < blocksWidth / 2; x++) {
+//            for (int z = -width*Chunk.WIDTH/2; z < blocksWidth / 2; z++) {
+//                for (int y = 0; y < 10; y++) {
+//                    int block = getBlockID(x, y, z);
+//                    if(block == -1)
+//                        System.out.printf("X %s Y %s Z %s - %s", x, y, z, block);
+//                }
+//            }
+//        }
 
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < width; z++) {
@@ -97,6 +90,27 @@ public class World {
         }
     }
 
+    public short getBlock(int x, int y, int z){
+        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+            return -1;
+        return chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].getBlock(Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+    }
+    public short getBlockID(int x, int y, int z){
+        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+            return -1;
+        return chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].getBlockID(Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+    }
+    public short getBlockState(int x, int y, int z){
+        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+            return -1;
+       return chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].getBlockState(Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+    }
+    public void setBlock(short id, byte state, int x, int y, int z){
+        if(x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
+            return;
+        chunks[(int) (x+blocksWidth/2)/Chunk.WIDTH][(int) (z+blocksWidth/2)/Chunk.WIDTH].setBlock(id, state,  Math.abs(x%Chunk.WIDTH), y, Math.abs(z%Chunk.WIDTH));
+    }
+
     public int getWidth() {
         return width;
     }
@@ -106,9 +120,9 @@ public class World {
         blocksWidth = width * Chunk.WIDTH;
     }
     public Chunk getChunk(int x, int z) {
-        if(x < 0 || x >= width || z < 0 || z >= width)
+        if(x < -width/2 || x >= width/2 || z < -width/2 || z >= width/2)
             return null;
-        return chunks[x][z];
+        return chunks[x+width/2][z+width/2];
     }
 
     public Chunk[][] getChunks() {

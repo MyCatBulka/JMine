@@ -7,6 +7,7 @@ import com.bulka.java.games.jmine.engine.graphics.mesh.Vertex;
 import com.bulka.java.games.jmine.engine.graphics.objects.GameObject;
 import com.bulka.java.games.jmine.engine.graphics.textures.Textures;
 import com.bulka.java.games.jmine.game.client.contorls.Controls;
+import com.bulka.java.games.jmine.game.client.graphics.Crosshair;
 import com.bulka.java.games.jmine.game.server.blocks.Blocks;
 import com.bulka.java.games.jmine.game.server.level.world.World;
 import org.joml.Matrix4f;
@@ -20,6 +21,7 @@ public class Game {
     private Hero hero;
     private Controls controls;
     private DevMenu devMenu;
+    private Crosshair crosshair;
     private Blocks blocks;
     private World world;
 
@@ -58,6 +60,10 @@ public class Game {
         controls = new Controls();
         controls.load();
         logger.info("Loaded contorls");
+        logger.info("Initializing crosshair");
+        crosshair = new Crosshair();
+        crosshair.init();
+        logger.info("Initialized crosshair");
         logger.info("Creating blocks");
         blocks = new Blocks();
         blocks.init();
@@ -65,7 +71,7 @@ public class Game {
 
 
         logger.info("Initializing Hero");
-        hero = new Hero(new Vector3f(5, 70, 5), new Vector3f(0, 0, 0));
+        hero = new Hero(new Vector3f(0, 12, 0), new Vector3f(0, 0, 0));
         hero.init();
         logger.info("Initialized Hero");
 
@@ -103,6 +109,7 @@ public class Game {
         world.render();
 
         devMenu.render();
+        crosshair.render();
    }
 
     public void destroy(){
@@ -110,6 +117,7 @@ public class Game {
         world.destroy();
         devMenu.destroy();
         controls.destroy();
+        crosshair.destroy();
     }
 
     public Hero getHero() {

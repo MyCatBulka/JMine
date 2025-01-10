@@ -31,7 +31,6 @@ public class SubChunk {
     private int startBlockY = 0;
     private int startBlockZ = 0;
     private short[] blocks;
-    private short[] palette;
     private ChunkMesh mesh;
     private Matrix4f worldPositionMatrix;
     private boolean isEmpty = false;
@@ -184,46 +183,69 @@ public class SubChunk {
     }
 
     public static int cordsToIndex(int x, int y, int z) {
+        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
+            return -1;
         return z * (SIZE) + y * WIDTH + x;
     }
 
     public short getBlock(int x, int y, int z) {
+        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
+            return -1;
         return blocks[z * (SIZE) + y * WIDTH + x];
     }
 
     public short getBlock(int i) {
+        if(i < 0 || i > SIZE)
+            return -1;
         return blocks[i];
     }
 
     public short getBlockId(int x, int y, int z) {
+        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH) {
+            return -1;
+        }
         return (short) ((blocks[z * (SIZE) + y * WIDTH + x] >>> 4) & 0x0FFF);
     }
 
     public short getBlockId(int i) {
+        if(i < 0 || i > SIZE)
+            return -1;
         return (short) ((blocks[i] >>> 4) & 0x0FFF);
     }
 
     public short getBlockState(int x, int y, int z) {
+        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
+            return -1;
         return (short) ((blocks[z * (SIZE) + y * WIDTH + x] & 0x0F));
     }
 
     public byte getBlockState(int i) {
+        if(i < 0 || i > SIZE)
+            return -1;
         return (byte) (blocks[i] & 0x0F);
     }
 
     public void setBlock(short block, int i) {
+        if(i < 0 || i > SIZE)
+            return;
         blocks[i] = block;
     }
 
     public void setBlock(short block, int x, int y, int z) {
+        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
+            return;
         blocks[z * (SIZE) + y * WIDTH + x] = block;
     }
 
     public void setBlock(short id, byte state, int i) {
+        if(i < 0 || i > SIZE)
+            return;
         blocks[i] = (short) ((id << 4) | state & 0x0F);
     }
 
     public void setBlock(short id, byte state, int x, int y, int z) {
+        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
+            return;
         blocks[z * (SIZE) + y * WIDTH + x] = (short) ((id << 4) | state & 0x0F);
     }
 
