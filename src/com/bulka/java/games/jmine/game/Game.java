@@ -10,6 +10,7 @@ import com.bulka.java.games.jmine.game.client.contorls.Controls;
 import com.bulka.java.games.jmine.game.client.graphics.Crosshair;
 import com.bulka.java.games.jmine.game.server.blocks.Blocks;
 import com.bulka.java.games.jmine.game.server.level.world.World;
+import com.bulka.java.games.jmine.game.server.level.world.WorldProvider;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -23,7 +24,7 @@ public class Game {
     private DevMenu devMenu;
     private Crosshair crosshair;
     private Blocks blocks;
-    private World world;
+    private WorldProvider worldProvider;
 
 
     public Game() {
@@ -76,8 +77,8 @@ public class Game {
         logger.info("Initialized Hero");
 
         logger.info("Creating world");
-        world = new World();
-        world.init();
+        worldProvider = new WorldProvider();
+        worldProvider.init();
         logger.info("Created world");
 
     }
@@ -85,7 +86,7 @@ public class Game {
     public void postInit(){
         hero.postInit();
         devMenu.postInit();
-        world.postInit();
+        worldProvider.postInit();
    }
 
     public void preUpdate(){
@@ -94,7 +95,7 @@ public class Game {
 
     public void update(){
         hero.update();
-        world.update();
+        worldProvider.update();
 
         devMenu.update();
     }
@@ -105,7 +106,7 @@ public class Game {
 
     public void render(){
 //        testGameObject.render();
-        world.render();
+        worldProvider.render();
         hero.render();
 
         devMenu.render();
@@ -114,7 +115,7 @@ public class Game {
 
     public void destroy(){
 //        testGameObject.destroy();
-        world.destroy();
+        worldProvider.destroy();
         devMenu.destroy();
         controls.destroy();
         crosshair.destroy();
@@ -144,7 +145,11 @@ public class Game {
         return Engine.getEngine().getGame();
     }
 
-    public World getWorld() {
-        return world;
+    public WorldProvider getWorldProvider() {
+        return worldProvider;
+    }
+
+    public Crosshair getCrosshair() {
+        return crosshair;
     }
 }
