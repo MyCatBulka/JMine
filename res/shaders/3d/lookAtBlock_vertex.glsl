@@ -1,13 +1,8 @@
 #version 330 core
 
 layout(location = 0) in vec3 position;
-layout(location = 1) in vec2 textureCoords;
-layout(location = 2) in float aLight;
 
 out vec3 pos;
-out vec2 texCoords;
-out float light;
-
 
 uniform mat4 projViewMat;
 uniform mat4 worldPosMat;
@@ -16,6 +11,4 @@ void main(){
     gl_Position = projViewMat * worldPosMat * vec4(position.x, position.y, position.z, 1.0);
 
     pos = position;
-    texCoords = textureCoords;
-    light = aLight;
 }

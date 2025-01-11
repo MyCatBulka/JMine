@@ -1,14 +1,18 @@
 package com.bulka.java.games.jmine.engine.graphics.camera;
 
+import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.nio.FloatBuffer;
+
 public class Camera {
     private final Matrix4f projectionMatrix;
     private final Matrix4f viewMatrix;
+    private FloatBuffer viewMatrixBuffer;
     private Vector3f pos = new Vector3f();
     private Vector3f rot = new Vector3f();
 
@@ -28,11 +32,14 @@ public class Camera {
 
     public void updateUniforms(){
         Matrix4f result = new Matrix4f(projectionMatrix).mul(viewMatrix);
+        FloatBuffer buffer = Shader.matrix4fToBuffer(result);
         ShaderManager.getSelf().getBase3DShader().bind();
-        ShaderManager.getSelf().getBase3DShader().setUniform("projViewMat", result);
+        ShaderManager.getSelf().getBase3DShader().setUniformMat4f("projViewMat", buffer);
         ShaderManager.getSelf().getChunkShader().bind();
-        ShaderManager.getSelf().getChunkShader().setUniform("projViewMat", result);
-        ShaderManager.getSelf().getChunkShader().unBind();
+        ShaderManager.getSelf().getChunkShader().setUniformMat4f("projViewMat", buffer);
+        ShaderManager.getSelf().getLookAtBlockShader().bind();
+        ShaderManager.getSelf().getLookAtBlockShader().setUniformMat4f("projViewMat", buffer);
+        ShaderManager.getSelf().getLookAtBlockShader().unBind();
     }
 
     public void updateProjectionMatrix(){

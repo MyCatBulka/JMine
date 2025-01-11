@@ -10,6 +10,7 @@ public class ShaderManager implements ILogic {
     private Shader Base3DShader;
     private Shader textShader;
     private Shader chunkShader;
+    private Shader lookAtBlockShader;
 
     public ShaderManager() {
 
@@ -22,6 +23,8 @@ public class ShaderManager implements ILogic {
         textShader.create("/shaders/2d/text_vertex.glsl", "/shaders/2d/text_fragment.glsl");
         chunkShader = new Shader();
         chunkShader.create("/shaders/3d/chunk/chunk_vertex.glsl", "/shaders/3d/chunk/chunk_fragment.glsl");
+        lookAtBlockShader = new Shader();
+        lookAtBlockShader.create("/shaders/3d/lookAtBlock_vertex.glsl", "/shaders/3d/lookAtBlock_fragment.glsl");
     }
 
     public Shader getTextShader() {
@@ -36,11 +39,16 @@ public class ShaderManager implements ILogic {
         return chunkShader;
     }
 
+    public Shader getLookAtBlockShader() {
+        return lookAtBlockShader;
+    }
+
     @Override
     public void destroy(){
         Base3DShader.destroy();
         textShader.destroy();
         chunkShader.destroy();
+        lookAtBlockShader.destroy();
     }
 
 

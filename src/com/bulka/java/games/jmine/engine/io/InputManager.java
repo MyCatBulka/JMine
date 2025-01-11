@@ -11,6 +11,8 @@ public class InputManager {
 
     private final boolean[] typedKeys = new boolean[GLFW.GLFW_KEY_LAST];
     private final boolean[] releasedKeys = new boolean[GLFW.GLFW_KEY_LAST];
+    private final boolean[] pressedButtons = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST];
+    private final boolean[] releasedButtons = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST];
 
     private double mouseX = 0;
     private double mouseY = 0;
@@ -53,6 +55,13 @@ public class InputManager {
         mouseButtons = new GLFWMouseButtonCallback() {
             @Override
             public void invoke(long window, int button, int action, int mods) {
+                if (action == GLFW.GLFW_PRESS) {
+                    pressedButtons[button] = true;
+                    releasedButtons[button] = false;
+                } else if (action == GLFW.GLFW_RELEASE) {
+                    pressedButtons[button] = false;
+                    releasedButtons[button] = true;
+                }
                 buttons[button] = (action != GLFW.GLFW_RELEASE);
             }
         };
@@ -91,6 +100,8 @@ public class InputManager {
     public void postUpdate() {
         Arrays.fill(typedKeys, false);
         Arrays.fill(releasedKeys, false);
+        Arrays.fill(pressedButtons, false);
+        Arrays.fill(releasedButtons, false);
     }
 
     public boolean isKeyDown(int key) {
@@ -198,6 +209,21 @@ public class InputManager {
 
     public GLFWCursorEnterCallback getEnterCallback() {
         return enterCallback;
+    }
+
+    public boolean[] getPressedButtons() {
+        return pressedButtons;
+    }
+
+    public boolean[] getReleasedButtons() {
+        return releasedButtons;
+    }
+    public boolean isPressedButton(int button) {
+        return pressedButtons[button];
+    }
+
+    public boolean isReleasedButton(int button) {
+        return releasedButtons[button];
     }
 
     public static InputManager getSelf(){

@@ -14,7 +14,7 @@ import java.nio.IntBuffer;
 public class ChunkMesh {
     private ChunkVertex[] vertices;
     private int[] indices;
-    private int vao = 0, pbo = 0, ibo = 0, tbo = 0;
+    private int vao = 0, pbo = 0, ibo = 0, tbo = 0, lbo = 0;
 
     public ChunkMesh() {
 
@@ -53,6 +53,13 @@ public class ChunkMesh {
         FloatBuffer textureCoordsBuffer = MemoryUtils.arrayToFloatBuffer(textureData);
         tbo = storeData(textureCoordsBuffer, 1, 2, GL11.GL_FLOAT);
 
+        float[] lightData = new float[vertices.length];
+        for (int i = 0; i < vertices.length; i++) {
+            lightData[i] = vertices[i].getLight();
+        }
+        FloatBuffer lightBuffer = MemoryUtils.arrayToFloatBuffer(lightData);
+        lbo = storeData(lightBuffer, 2, 1, GL11.GL_FLOAT);
+
         if (indices != null) {
             IntBuffer indicesBuffer = MemoryUtils.arrayToIntBuffer(indices);
             ibo = GL15.glGenBuffers();
@@ -62,6 +69,7 @@ public class ChunkMesh {
         } else {
             ibo = 0;
         }
+        GL30.glBindVertexArray(0);
 
     }
 
@@ -98,10 +106,15 @@ public class ChunkMesh {
         return tbo;
     }
 
+    public int getLBO() {
+        return lbo;
+    }
+
     public void destroy(){
         GL15.glDeleteBuffers(pbo);
         GL15.glDeleteBuffers(ibo);
         GL15.glDeleteBuffers(tbo);
+        GL15.glDeleteBuffers(lbo);
 
         GL30.glDeleteVertexArrays(vao);
     }
@@ -114,19 +127,4 @@ public class ChunkMesh {
         this.indices = indices;
     }
 
-    public int getVao() {
-        return vao;
-    }
-
-    public int getPbo() {
-        return pbo;
-    }
-
-    public int getIbo() {
-        return ibo;
-    }
-
-    public int getTbo() {
-        return tbo;
-    }
 }

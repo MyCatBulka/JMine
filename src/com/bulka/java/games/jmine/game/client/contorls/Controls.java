@@ -13,6 +13,8 @@ public class Controls {
     public int up = GLFW.GLFW_KEY_SPACE;
     public int down = GLFW.GLFW_KEY_LEFT_SHIFT;
     public int devMenu = GLFW.GLFW_KEY_F3;
+    public int renderMethod = GLFW.GLFW_KEY_R;
+    public int recreateMesh = GLFW.GLFW_KEY_M;
 
     public void load(){
         mouseSensitivity = SettingsManager.getSelf().getFloat("game.controls.mouse_sensitivity", 0.2f);
@@ -23,6 +25,8 @@ public class Controls {
         up = SettingsManager.getSelf().getInt("game.controls.up", GLFW.GLFW_KEY_SPACE);
         down = SettingsManager.getSelf().getInt("game.controls.down", GLFW.GLFW_KEY_LEFT_SHIFT);
         devMenu = SettingsManager.getSelf().getInt("game.controls.dev_menu", GLFW.GLFW_KEY_F3);
+        renderMethod = SettingsManager.getSelf().getInt("game.controls.render_method", GLFW.GLFW_KEY_R);
+        recreateMesh = SettingsManager.getSelf().getInt("game.controls.recreate_mesh", GLFW.GLFW_KEY_M);
     }
 
 

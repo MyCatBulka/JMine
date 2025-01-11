@@ -130,6 +130,9 @@ public class Textures implements ILogic {
             GL11.glDeleteTextures(texture);
         }
         logger.config("Deleted textures");
+    }
+    public void reload(){
+        destroy();
         init();
     }
 

@@ -1,6 +1,7 @@
 package com.bulka.java.games.jmine.game.server.level.world.chunk;
 
 import com.bulka.java.games.jmine.engine.graphics.mesh.Vertex;
+import com.bulka.java.games.jmine.engine.graphics.shaders.Shader;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
 import com.bulka.java.games.jmine.engine.graphics.textures.Textures;
 import com.bulka.java.games.jmine.game.server.blocks.Block;
@@ -15,6 +16,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +35,9 @@ public class SubChunk {
     private short[] blocks;
     private ChunkMesh mesh;
     private Matrix4f worldPositionMatrix;
+    private FloatBuffer worldPositionBuffer;
     private boolean isEmpty = false;
+    private static int renderMethod = GL11.GL_TRIANGLES;
 
     public SubChunk() {
 
@@ -75,6 +79,7 @@ public class SubChunk {
         List<Integer> indices = new ArrayList<>();
         worldPositionMatrix.identity();
         worldPositionMatrix = worldPositionMatrix.translate(startBlockX, startBlockY, startBlockZ);
+        worldPositionBuffer = Shader.matrix4fToBuffer(worldPositionMatrix);
         int faceIndex = 0;
         boolean[] alphaNeighbours = new boolean[6];
         for (int x = 0; x < WIDTH; x++) {
@@ -129,13 +134,14 @@ public class SubChunk {
                     for (int side = 0; side < 6; side++) {
                         if (alphaNeighbours[side]) {
                             Face face = block.getSide(side);
+                            float l = face.getLight();
                             for (Vertex vertex : face.getFace()) {
                                 vertices.add(new ChunkVertex(
                                         vertex.getX() + x,
                                         vertex.getY() + y,
                                         vertex.getZ() + z,
                                         vertex.getU(),
-                                        vertex.getV()));
+                                        vertex.getV(), l));
                             }
                             indices.add(faceIndex + Face.INDICES[0]);
                             indices.add(faceIndex + Face.INDICES[1]);
@@ -153,6 +159,7 @@ public class SubChunk {
         if(vertices.size() == 1) {
             isEmpty = true;
         } else {
+            mesh.destroy();
             mesh = new ChunkMesh(vertices.toArray(new ChunkVertex[0]), indices.stream().mapToInt(i -> i).toArray());
             mesh.create();
         }
@@ -160,17 +167,16 @@ public class SubChunk {
 
     public void render() {
         if(!isEmpty) {
-//            long nano = System.nanoTime();
             GL30.glBindVertexArray(mesh.getVAO());
             GL30.glEnableVertexAttribArray(0);
             GL30.glEnableVertexAttribArray(1);
+            GL30.glEnableVertexAttribArray(2);
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, mesh.getIBO());
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL13.glBindTexture(GL13.GL_TEXTURE_2D, Textures.getSelf().getBlocksTexture());
             ShaderManager.getSelf().getChunkShader().bind();
-            ShaderManager.getSelf().getChunkShader().setUniform("worldPosMat", worldPositionMatrix);
-//            System.out.println(System.nanoTime() - nano);
-            GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getIndices().length, GL11.GL_UNSIGNED_INT, 0);
+            ShaderManager.getSelf().getChunkShader().setUniformMat4f("worldPosMat", worldPositionBuffer);
+            GL11.glDrawElements(renderMethod, mesh.getIndices().length, GL11.GL_UNSIGNED_INT, 0);
             ShaderManager.getSelf().getChunkShader().unBind();
             GL13.glBindTexture(GL13.GL_TEXTURE_2D, 0);
             GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -178,6 +184,7 @@ public class SubChunk {
 
             GL30.glDisableVertexAttribArray(0);
             GL30.glDisableVertexAttribArray(1);
+            GL30.glDisableVertexAttribArray(2);
             GL30.glBindVertexArray(0);
         }
     }
@@ -383,5 +390,13 @@ public class SubChunk {
 
     public boolean isEmpty() {
         return isEmpty;
+    }
+
+    public static int getRenderMethod() {
+        return renderMethod;
+    }
+
+    public static void setRenderMethod(int renderMethod) {
+        SubChunk.renderMethod = renderMethod;
     }
 }

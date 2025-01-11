@@ -125,8 +125,19 @@ public class Shader {
     public void setUniform(String name, Matrix4f value){
         FloatBuffer buffer = MemoryUtil.memAllocFloat(16);
         value.get(buffer);
-        if(successful)
+        if(successful) {
             GL20.glUniformMatrix4fv(getUniformLocation(name), false, buffer);
+        }
+    }
+    public void setUniformMat4f(String name, FloatBuffer buffer){
+        if(successful) {
+            GL20.glUniformMatrix4fv(getUniformLocation(name), false, buffer);
+        }
+    }
+    public static FloatBuffer matrix4fToBuffer(Matrix4f value){
+        FloatBuffer buffer = MemoryUtil.memAllocFloat(16);
+        value.get(buffer);
+        return buffer;
     }
 
     public void destroy(){

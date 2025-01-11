@@ -6,12 +6,12 @@ import com.bulka.java.games.jmine.settings.SettingsManager;
 
 
 public class World {
-    private int renderDistance = 2 * 2 + 1;
+    private int renderDistance = 2 * 2;
     private int blocksWidth = renderDistance * Chunk.WIDTH;
     public Chunk[][] chunks;
 
     public void init() {
-        renderDistance = SettingsManager.getSelf().getInt("game.graphics.render_distance", 2) * 2 + 1;
+        renderDistance = SettingsManager.getSelf().getInt("game.graphics.render_distance", 2) * 2;
         blocksWidth = renderDistance * Chunk.WIDTH;
         generate();
     }
@@ -56,6 +56,14 @@ public class World {
         }
     }
 
+    public void updateMeshes(){
+        for (int x = 0; x < renderDistance; x++) {
+            for (int z = 0; z < renderDistance; z++) {
+                chunks[x][z].updateMeshes();
+            }
+        }
+    }
+
 
     public short getBlock(int x, int y, int z) {
         if (x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
@@ -66,6 +74,7 @@ public class World {
     public short getBlockID(int x, int y, int z) {
         if (x < -blocksWidth / 2 || x > blocksWidth / 2 || y < 0 || y > Chunk.HEIGHT || z < -blocksWidth / 2 || z > blocksWidth / 2)
             return -1;
+//        System.out.println(x + " " + y + " " + z);
         return chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].getBlockID((x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
     }
 

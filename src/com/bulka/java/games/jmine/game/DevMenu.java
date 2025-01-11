@@ -6,6 +6,8 @@ import com.bulka.java.games.jmine.engine.graphics.render.TextRendererGL;
 import com.bulka.java.games.jmine.engine.io.InputManager;
 import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.game.client.contorls.Controls;
+import com.bulka.java.games.jmine.game.server.level.world.WorldProvider;
+import com.bulka.java.games.jmine.game.server.level.world.chunk.SubChunk;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -44,8 +46,19 @@ public class DevMenu {
     }
 
     public void update() {
-        if (InputManager.getSelf().isKeyTypedClicked(Controls.getSelf().devMenu))
+        if (InputManager.getSelf().isKeyTypedClicked(Controls.getSelf().devMenu)) {
             show = !show;
+        }
+        if (InputManager.getSelf().isKeyTypedClicked(Controls.getSelf().renderMethod)){
+            if(SubChunk.getRenderMethod() == GL11.GL_TRIANGLES) {
+                SubChunk.setRenderMethod(GL11.GL_LINE_STRIP);
+            } else if (SubChunk.getRenderMethod() == GL11.GL_LINE_STRIP){
+                SubChunk.setRenderMethod(GL11.GL_TRIANGLES);
+            }
+        }
+        if (InputManager.getSelf().isKeyTypedClicked(Controls.getSelf().recreateMesh)) {
+            WorldProvider.getSelf().getWorld().updateMeshes();
+        }
         if (show) {
             if (System.currentTimeMillis() - textUpdateperiodStart >= textUpdatePeriod) {
                 textUpdateperiodStart = System.currentTimeMillis();

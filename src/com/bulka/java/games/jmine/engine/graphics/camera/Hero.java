@@ -6,13 +6,15 @@ import com.bulka.java.games.jmine.game.client.contorls.Controls;
 import com.bulka.java.games.jmine.game.server.level.world.WorldProvider;
 import com.bulka.java.games.jmine.game.server.level.world.chunk.Chunk;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import java.util.logging.Logger;
 
 public class Hero {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private Vector3f position;
-    private Vector3f rotation;
+    private Vector3f position = new Vector3f();
+    private Vector3f rotation = new Vector3f();
+    private Vector3f direction = new Vector3f();
     private Camera camera;
     private float speed = 10f;
     private float verticalSpeed = 10f;
@@ -41,11 +43,32 @@ public class Hero {
         camera.setRot(rotation);
         camera.updateProjectionMatrix();
         camera.updateViewMatrix();
+        updateDirection();
     }
 
     public void update(){
         boolean changed = false;
         float deltaTime = (float) Engine.getEngine().getDeltaTime();
+
+        if(InputManager.getSelf().isPressedButton(0)){
+            if(WorldProvider.getSelf().getLookingAtBlockFace() != null) {
+                int x = (WorldProvider.getSelf().getLookingAtBlockCords().x);
+                int y = (WorldProvider.getSelf().getLookingAtBlockCords().y);
+                int z = (WorldProvider.getSelf().getLookingAtBlockCords().z);
+//                WorldProvider.getSelf().getWorld().setBlock((short) 0, (byte) 0, x, y, z);
+//                WorldProvider.getSelf().getWorld().getChunk((int) Math.floor((double) x/16),(int) Math.floor((double)z/16)).getSubChunk(y/16).updateMesh();
+                WorldProvider.getSelf().setBlockAndUpdateMeshes((short) 0, x, y, z);
+            }
+        }
+        if(InputManager.getSelf().isPressedButton(1)){
+            if(WorldProvider.getSelf().getLookingAtBlockFace() != null) {
+                Vector3i normal = WorldProvider.getSelf().getLookingAtBlockFace().getNormal();
+                int x = (WorldProvider.getSelf().getLookingAtBlockCords().x + normal.x);
+                int y = (WorldProvider.getSelf().getLookingAtBlockCords().y + normal.y);
+                int z = (WorldProvider.getSelf().getLookingAtBlockCords().z + normal.z);
+                WorldProvider.getSelf().setBlockAndUpdateMeshes((short) 1, x, y, z);
+            }
+        }
 
         if(InputManager.getSelf().isInWindow() && !Engine.getEngine().isShowCursor()) {
             if (InputManager.getSelf().getMouseMovementX() != 0) {
@@ -116,6 +139,8 @@ public class Hero {
         float dx = (float) Math.sin(Math.toRadians(rotation.y)) * -1.0f * z + (float)Math.sin(Math.toRadians(rotation.y - 90)) * -1.0f * x;
         float dz = (float) Math.cos(Math.toRadians(rotation.y)) * z + (float)Math.cos(Math.toRadians(rotation.y - 90)) * x;
         position.add(dx, y, dz);
+//        System.out.println(direction.x + " " + direction.y + " " + direction.z);
+//        position.add(direction.x * x, y, direction.z * z);
     }
     public void setRotation(float x, float y, float z) {
         rotation.set(x, y, z);
@@ -128,6 +153,7 @@ public class Hero {
             rotation.x = -90;
         if(rotation.x > 90)
             rotation.x = 90;
+        updateDirection();
     }
     public void addRotation(float x, float y, float z) {
         rotation.add(x, y, z);
@@ -140,6 +166,33 @@ public class Hero {
             rotation.x = -90;
         if(rotation.x > 90)
             rotation.x = 90;
+        updateDirection();
+    }
+//    public void updateDirection() {
+//        float pitch = (float) Math.toRadians(rotation.x);
+//        float yaw = (float) Math.toRadians(rotation.y);
+//
+//        float dirX = (float) (Math.cos(pitch) * Math.sin(yaw));
+//        float dirY = (float) -Math.sin(pitch);
+//        float dirZ = (float) (Math.cos(pitch) * Math.cos(yaw));
+//
+//        direction = new Vector3f(dirX, dirY, dirZ).normalize();
+//    }
+    public void updateDirection() {
+        float pitch = (float) Math.toRadians(rotation.x);
+        float yaw = (float) Math.toRadians(rotation.y);
+
+        float dirX = (float) (Math.cos(pitch) * Math.sin(yaw));
+        float dirY = (float) -Math.sin(pitch);
+        float dirZ = (float) -(Math.cos(pitch) * Math.cos(yaw));
+
+        direction.x = dirX;
+        direction.y = dirY;
+        direction.z = dirZ;
+    }
+
+    public Vector3f getDirection() {
+        return direction;
     }
 
     public void render(){

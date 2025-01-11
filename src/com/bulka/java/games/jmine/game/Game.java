@@ -72,7 +72,7 @@ public class Game {
 
 
         logger.info("Initializing Hero");
-        hero = new Hero(new Vector3f(0, 12, 0), new Vector3f(0, 0, 0));
+        hero = new Hero(new Vector3f(0, 5, 0), new Vector3f(0, 0, 0));
         hero.init();
         logger.info("Initialized Hero");
 
@@ -105,7 +105,6 @@ public class Game {
     }
 
     public void render(){
-//        testGameObject.render();
         worldProvider.render();
         hero.render();
 
@@ -114,7 +113,6 @@ public class Game {
    }
 
     public void destroy(){
-//        testGameObject.destroy();
         worldProvider.destroy();
         devMenu.destroy();
         controls.destroy();
