@@ -82,32 +82,17 @@ public class Chunk {
             return -1;
         return subChunks[(int) y / SubChunk.HEIGHT].getBlock(x, y % SubChunk.HEIGHT, z);
     }
-    public short getBlockID(int x, int y, int z) {
-        if (y < 0 || y > HEIGHT)
-            return -1;
-        return subChunks[(int) y / SubChunk.HEIGHT].getBlockId(x, y % SubChunk.HEIGHT, z);
-    }
-    public short getBlockState(int x, int y, int z) {
-        if (y < 0 || y > HEIGHT)
-            return -1;
-        return subChunks[(int) y / SubChunk.HEIGHT].getBlockState(x, y % SubChunk.HEIGHT, z);
-    }
 
-    public void setBlock(short id, byte state, int x, int y, int z) {
+
+    public void setBlock(short id, int x, int y, int z) {
         if (y < 0 || y > HEIGHT)
             return;
-        subChunks[(int) y / SubChunk.HEIGHT].setBlock(id, state, x, y % SubChunk.HEIGHT, z);
+        subChunks[y / SubChunk.HEIGHT].setBlock(id, x, y % SubChunk.HEIGHT, z);
     }
 
     public SubChunk getSubChunk(int y) {
         if (y < 0 || y >= NUM_SUB_CHUNKS)
             return null;
-        return subChunks[y];
-    }
-
-    public SubChunk getSubChunkChecked(int y) {
-        if (y < 0 || y > NUM_SUB_CHUNKS)
-            throw new IllegalArgumentException("SubChunk out of bounds (" + y + ")");
         return subChunks[y];
     }
 

@@ -44,7 +44,6 @@ public class DevMenu {
     private int nonHeapFree;
     private int allocatedAll;
     private int usedAll;
-    private MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();;
 
     public void init() {
 
@@ -109,7 +108,7 @@ public class DevMenu {
         used = allocated - free;
 
 
-
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         MemoryUsage nonHeapMemoryUsage = memoryMXBean.getNonHeapMemoryUsage();
 
         nonHeapMemoryUsed = (int) (nonHeapMemoryUsage.getUsed() / 1048576);

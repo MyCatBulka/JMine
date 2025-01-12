@@ -9,12 +9,16 @@ import com.bulka.java.games.jmine.game.server.blocks.Block;
 import com.bulka.java.games.jmine.game.server.blocks.Blocks;
 import com.bulka.java.games.jmine.game.server.blocks.Face;
 import com.bulka.java.games.jmine.game.server.level.world.chunk.Chunk;
+import com.bulka.java.games.jmine.game.server.level.world.chunk.SubChunk;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryUtil;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +28,7 @@ public class WorldProvider {
     private Logger logger = Logger.getLogger(WorldProvider.class.getName());
     private World world;
     private Matrix4f lookAtMatrix = new Matrix4f();
+    private FloatBuffer lookAtMatrixBuffer;
     private BasicLinesMesh lookAtMesh = new BasicLinesMesh();
     private boolean isLookingAtBlock = false;
     private Vector3i lookingAtBlockCords = new Vector3i();
@@ -69,7 +74,7 @@ public class WorldProvider {
             }
         }
 
-        world.setBlock((short) 3, (byte) 0, 0, 10, 0);
+        world.setBlock((short) 3, 0, 10, 0);
 
         for (int x = 0; x < renderDistance; x++) {
             for (int z = 0; z < renderDistance; z++) {
@@ -91,9 +96,9 @@ public class WorldProvider {
             for (int z = 0; z < Chunk.WIDTH; z++) {
                 int height = random.nextInt(3) + 1;
                 for (int y = 0; y < height; y++) {
-                    chunk.setBlock((short) 2, (byte) 0, x, y, z);
+                    chunk.setBlock((short) 2, x, y, z);
                 }
-                chunk.setBlock((short) 3, (byte) 0, x, height, z);
+                chunk.setBlock((short) 3, x, height, z);
             }
         }
     }
@@ -141,19 +146,21 @@ public class WorldProvider {
 
     public void checkLookingAtBlock() {
         isLookingAtBlock = false;
+        lookingAtBlockBlock = null;
+        lookingAtBlockID = -1;
         Vector3f rayPos = new Vector3f(Hero.getSelf().getPosition());
         Vector3f rayDir = new Vector3f(Hero.getSelf().getDirection());
-        float step = 0.01f;
+        float step = Face.BLOCK_TEXTURE_WIDTH_FLOAT;
 
         for (float distance = 0f; distance <= lookingDistance; distance += step) {
             int blockX = (int) Math.floor(rayPos.x);
             int blockY = (int) Math.floor(rayPos.y);
             int blockZ = (int) Math.floor(rayPos.z);
-            short currentBlockID = world.getBlockID(blockX, blockY, blockZ);
-            if (currentBlockID != -1) {
-                Block block = Blocks.getSelf().getBlock(currentBlockID);
+            short currentBlock = world.getBlock(blockX, blockY, blockZ);
+            if (currentBlock != -1) {
+                Block block = Blocks.getSelf().getBlock(currentBlock);
                 if (block.isFocusable()) {
-                    setLookAtBlock(currentBlockID, blockX, blockY, blockZ);
+                    setLookAtBlock(currentBlock, blockX, blockY, blockZ);
 
                     int faceLookingAt = getFaceLookingAt(rayPos, blockX, blockY, blockZ);
                     if (faceLookingAt != -1)
@@ -170,7 +177,7 @@ public class WorldProvider {
     }
 
     private int getFaceLookingAt(Vector3f hitPoint, int blockX, int blockY, int blockZ) {
-        float epsilon = 0.01f;
+        float epsilon = Face.BLOCK_TEXTURE_WIDTH_FLOAT;
         if (Math.abs(hitPoint.x - blockX) < epsilon) {
             return 2;
         } else if (Math.abs(hitPoint.x - (blockX + 1)) < epsilon) {
@@ -269,11 +276,13 @@ public class WorldProvider {
     }
 
     public void setLookAtBlock(short id, int x, int y, int z) {
+        if(x == lookingAtBlockCords.x && y == lookingAtBlockCords.y && z == lookingAtBlockCords.z)
+            return;
         lookingAtBlockBlock = Blocks.getSelf().getBlock(id);
         if (lookingAtBlockCords.x != x || lookingAtBlockCords.y != y || lookingAtBlockCords.z != z || lookingAtBlockID != id) {
             Block block = Blocks.getSelf().getBlock(id);
             List<Vector3f> vertices = new ArrayList<>();
-            float offset = 0.01f;
+            float offset = 0.003f;
             Vector3f vec0;
             Vector3f vec1;
             Vector3f vec2;
@@ -476,7 +485,9 @@ public class WorldProvider {
             lookAtMatrix.identity();
             lookAtMatrix.translate(x, y, z);
             ShaderManager.getSelf().getLookAtBlockShader().bind();
-            ShaderManager.getSelf().getLookAtBlockShader().setUniform("worldPosMat", lookAtMatrix);
+            lookAtMatrixBuffer = MemoryUtil.memAllocFloat(16);
+            lookAtMatrix.get(lookAtMatrixBuffer);
+            ShaderManager.getSelf().getLookAtBlockShader().setUniformMat4f("worldPosMat", lookAtMatrixBuffer);
             ShaderManager.getSelf().getLookAtBlockShader().unBind();
             lookingAtBlockCords.set(x, y, z);
             lookingAtBlockID = id;
@@ -484,33 +495,72 @@ public class WorldProvider {
     }
 
     public void setBlockAndUpdateMeshes(short id, int x, int y, int z) {
-        WorldProvider.getSelf().getWorld().setBlock((short) id, (byte) 0, x, y, z);
+        if (x < -world.getBlocksWidth() / 2 || x >= world.getBlocksWidth() / 2 || y < 0 || y >= Chunk.HEIGHT || z < -world.getBlocksWidth() / 2 || z >= world.getBlocksWidth() / 2)
+            return;
+        WorldProvider.getSelf().getWorld().setBlock(id, x, y, z);
 
-        int chunkX = (int) Math.floor((double) x / 16);
-        int chunkY = (int) Math.floor((double) y / 16);
-        int chunkZ = (int) Math.floor((double) z / 16);
-        WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ).getSubChunk(chunkY).updateMesh();
+        int chunkX = (int) Math.floor((double) x / Chunk.WIDTH);
+        int chunkY = (int) Math.floor((double) y / SubChunk.HEIGHT);
+        int chunkZ = (int) Math.floor((double) z / Chunk.WIDTH);
 
         int inChunkX = (x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH;
-        int inChunkY = (y % Chunk.HEIGHT + Chunk.HEIGHT) % Chunk.HEIGHT;
+        int inChunkY = (y % SubChunk.HEIGHT + SubChunk.HEIGHT) % SubChunk.HEIGHT;
         int inChunkZ = (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH;
 
         if (inChunkX == 0) {
-            WorldProvider.getSelf().getWorld().getChunk(chunkX - 1, chunkZ).getSubChunk(chunkY).updateMesh();
+            Chunk chunk =  WorldProvider.getSelf().getWorld().getChunk(chunkX - 1, chunkZ);
+            if(chunk != null) {
+                SubChunk subChunk = chunk.getSubChunk(chunkY);
+                if(subChunk != null){
+                    subChunk.updateMesh();
+                }
+            }
         } else if (inChunkX == Chunk.WIDTH - 1) {
-            WorldProvider.getSelf().getWorld().getChunk(chunkX + 1, chunkZ).getSubChunk(chunkY).updateMesh();
+            Chunk chunk =  WorldProvider.getSelf().getWorld().getChunk(chunkX + 1, chunkZ);
+            if(chunk != null) {
+                SubChunk subChunk = chunk.getSubChunk(chunkY);
+                if(subChunk != null){
+                    subChunk.updateMesh();
+                }
+            }
         }
         if (inChunkZ == 0) {
-            WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ - 1).getSubChunk(chunkY).updateMesh();
+            Chunk chunk =  WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ-1);
+            if(chunk != null) {
+                SubChunk subChunk = chunk.getSubChunk(chunkY);
+                if(subChunk != null){
+                    subChunk.updateMesh();
+                }
+            }
         } else if (inChunkZ == Chunk.WIDTH - 1) {
-            WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ + 1).getSubChunk(chunkY).updateMesh();
+            Chunk chunk =  WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ+1);
+            if(chunk != null) {
+                SubChunk subChunk = chunk.getSubChunk(chunkY);
+                if(subChunk != null){
+                    subChunk.updateMesh();
+                }
+            }
         }
         if (inChunkY == 0) {
-            WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ).getSubChunk(chunkY - 1).updateMesh();
-        } else if (inChunkY == Chunk.HEIGHT - 1) {
-            WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ).getSubChunk(chunkY + 1).updateMesh();
+            Chunk chunk =  WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ);
+            if(chunk != null) {
+                SubChunk subChunk = chunk.getSubChunk(chunkY-1);
+                if(subChunk != null){
+                    subChunk.updateMesh();
+                }
+            }
+        }
+        else if (inChunkY == SubChunk.HEIGHT - 1) {
+            Chunk chunk = WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ);
+            if(chunk != null) {
+                SubChunk subChunk = chunk.getSubChunk(chunkY+1);
+                if(subChunk != null){
+                    subChunk.updateMesh();
+                }
+            }
         }
 
+        WorldProvider.getSelf().getWorld().getChunk(chunkX, chunkZ).getSubChunk(chunkY).updateMesh();
 
     }
 

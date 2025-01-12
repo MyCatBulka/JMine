@@ -51,22 +51,26 @@ public class Hero {
         float deltaTime = (float) Engine.getEngine().getDeltaTime();
 
         if(InputManager.getSelf().isPressedButton(0)){
-            if(WorldProvider.getSelf().getLookingAtBlockFace() != null) {
-                int x = (WorldProvider.getSelf().getLookingAtBlockCords().x);
-                int y = (WorldProvider.getSelf().getLookingAtBlockCords().y);
-                int z = (WorldProvider.getSelf().getLookingAtBlockCords().z);
-//                WorldProvider.getSelf().getWorld().setBlock((short) 0, (byte) 0, x, y, z);
-//                WorldProvider.getSelf().getWorld().getChunk((int) Math.floor((double) x/16),(int) Math.floor((double)z/16)).getSubChunk(y/16).updateMesh();
-                WorldProvider.getSelf().setBlockAndUpdateMeshes((short) 0, x, y, z);
+            if(WorldProvider.getSelf().isLookingAtBlock()) {
+                if(WorldProvider.getSelf().getLookingAtBlockFace() != null) {
+                    int x = (WorldProvider.getSelf().getLookingAtBlockCords().x);
+                    int y = (WorldProvider.getSelf().getLookingAtBlockCords().y);
+                    int z = (WorldProvider.getSelf().getLookingAtBlockCords().z);
+    //                WorldProvider.getSelf().getWorld().setBlock((short) 0, (byte) 0, x, y, z);
+    //                WorldProvider.getSelf().getWorld().getChunk((int) Math.floor((double) x/16),(int) Math.floor((double)z/16)).getSubChunk(y/16).updateMesh();
+                    WorldProvider.getSelf().setBlockAndUpdateMeshes((short) 0, x, y, z);
+                }
             }
         }
         if(InputManager.getSelf().isPressedButton(1)){
-            if(WorldProvider.getSelf().getLookingAtBlockFace() != null) {
-                Vector3i normal = WorldProvider.getSelf().getLookingAtBlockFace().getNormal();
-                int x = (WorldProvider.getSelf().getLookingAtBlockCords().x + normal.x);
-                int y = (WorldProvider.getSelf().getLookingAtBlockCords().y + normal.y);
-                int z = (WorldProvider.getSelf().getLookingAtBlockCords().z + normal.z);
-                WorldProvider.getSelf().setBlockAndUpdateMeshes((short) 1, x, y, z);
+            if(WorldProvider.getSelf().isLookingAtBlock()) {
+                if (WorldProvider.getSelf().getLookingAtBlockFace() != null) {
+                    Vector3i normal = WorldProvider.getSelf().getLookingAtBlockFace().getNormal();
+                    int x = (WorldProvider.getSelf().getLookingAtBlockCords().x + normal.x);
+                    int y = (WorldProvider.getSelf().getLookingAtBlockCords().y + normal.y);
+                    int z = (WorldProvider.getSelf().getLookingAtBlockCords().z + normal.z);
+                    WorldProvider.getSelf().setBlockAndUpdateMeshes((short) 1, x, y, z);
+                }
             }
         }
 

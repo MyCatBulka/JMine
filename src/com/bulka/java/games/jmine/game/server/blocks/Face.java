@@ -12,6 +12,9 @@ public class Face {
             0, 1, 2,
             2, 3, 0
     };
+    public static final int BLOCKS_TEXTURE_WIDTH = 1024;
+    public static final int BLOCK_TEXTURE_WIDTH = 16;
+    public static final float BLOCK_TEXTURE_WIDTH_FLOAT = (float) BLOCK_TEXTURE_WIDTH / BLOCKS_TEXTURE_WIDTH;
     public int textureIDX = 0;
     public int textureIDY = 0;
     public boolean invertedTexture = false;
@@ -59,15 +62,15 @@ public class Face {
 
     public void recalcTexture(){
         if(invertedTexture){
-            face[0].setTextureCoords(0.015625f*(textureIDX), 0.015625f*(textureIDY+1));
-            face[1].setTextureCoords(0.015625f*(textureIDX+1), 0.015625f*(textureIDY+1));
-            face[2].setTextureCoords(0.015625f*(textureIDX+1), 0.015625f*(textureIDY));
-            face[3].setTextureCoords(0.015625f*(textureIDX), 0.015625f*(textureIDY));
+            face[0].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDX), BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDY+1));
+            face[1].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDX+1), BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDY+1));
+            face[2].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDX+1), BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDY));
+            face[3].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDX), BLOCK_TEXTURE_WIDTH_FLOAT*(textureIDY));
         } else {
-            face[0].setTextureCoords(0.015625f * (textureIDX + 1), 0.015625f * (textureIDY));
-            face[1].setTextureCoords(0.015625f * (textureIDX), 0.015625f * (textureIDY));
-            face[2].setTextureCoords(0.015625f * (textureIDX), 0.015625f * (textureIDY + 1));
-            face[3].setTextureCoords(0.015625f * (textureIDX + 1), 0.015625f * (textureIDY + 1));
+            face[0].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDX + 1), BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDY));
+            face[1].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDX), BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDY));
+            face[2].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDX), BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDY + 1));
+            face[3].setTextureCoords(BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDX + 1), BLOCK_TEXTURE_WIDTH_FLOAT * (textureIDY + 1));
         }
         Vector3f norm = new Vector3f();
         GeometryUtils.normal(face[0].getPosition(), face[1].getPosition(), face[2].getPosition(), norm);

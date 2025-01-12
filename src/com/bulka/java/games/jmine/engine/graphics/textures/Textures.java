@@ -3,6 +3,8 @@ package com.bulka.java.games.jmine.engine.graphics.textures;
 import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.ILogic;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 
 import javax.imageio.ImageIO;
@@ -106,9 +108,12 @@ public class Textures implements ILogic {
         int textureID = GL11.glGenTextures();
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST_MIPMAP_LINEAR);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
+        GL13.glTexParameteri(GL11.GL_TEXTURE_2D, GL13.GL_TEXTURE_MAX_LEVEL, 4);
+
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
         return textureID;

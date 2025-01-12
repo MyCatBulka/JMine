@@ -66,27 +66,15 @@ public class World {
 
 
     public short getBlock(int x, int y, int z) {
-        if (x <= -blocksWidth / 2 || x >= blocksWidth / 2 || y < 0 || y >= Chunk.HEIGHT || z <= -blocksWidth / 2 || z >= blocksWidth / 2)
+        if (x < -blocksWidth / 2 || x >= blocksWidth / 2 || y < 0 || y >= Chunk.HEIGHT || z < -blocksWidth / 2 || z >= blocksWidth / 2)
             return -1;
         return chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].getBlock((x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
     }
 
-    public short getBlockID(int x, int y, int z) {
-        if (x <= -blocksWidth / 2 || x >= blocksWidth / 2 || y < 0 || y >= Chunk.HEIGHT || z <= -blocksWidth / 2 || z >= blocksWidth / 2)
-            return -1;
-        return chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].getBlockID((x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
-    }
-
-    public short getBlockState(int x, int y, int z) {
-        if (x <= -blocksWidth / 2 || x >= blocksWidth / 2 || y < 0 || y >= Chunk.HEIGHT || z <= -blocksWidth / 2 || z >= blocksWidth / 2)
-            return -1;
-        return chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].getBlockState((x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
-    }
-
-    public void setBlock(short id, byte state, int x, int y, int z) {
-        if (x <= -blocksWidth / 2 || x >= blocksWidth / 2 || y < 0 || y >= Chunk.HEIGHT || z <= -blocksWidth / 2 || z >= blocksWidth / 2)
+    public void setBlock(short block, int x, int y, int z) {
+        if (x < -blocksWidth / 2 || x >= blocksWidth / 2 || y < 0 || y >= Chunk.HEIGHT || z < -blocksWidth / 2 || z >= blocksWidth / 2)
             return;
-        chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].setBlock(id, state, (x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
+        chunks[(int) (x + blocksWidth / 2) / Chunk.WIDTH][(int) (z + blocksWidth / 2) / Chunk.WIDTH].setBlock(block, (x % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH, y, (z % Chunk.WIDTH + Chunk.WIDTH) % Chunk.WIDTH);
     }
 
     public int getRenderDistance() {

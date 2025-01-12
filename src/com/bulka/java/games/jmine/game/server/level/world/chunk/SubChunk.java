@@ -86,11 +86,9 @@ public class SubChunk {
             for (int y = 0; y < HEIGHT; y++) {
                 for (int z = 0; z < WIDTH; z++) {
                     int i = z * (SIZE) + y * WIDTH + x;
-                    short blockNum = blocks[i];
-                    short blockID = (short) ((blockNum >>> 4) & 0x0FFF);
+                    short blockID = blocks[i];
                     if(blockID == 0)
                         continue;
-                    byte state = (byte) (blockNum & 0x0F);
                     Block block = Blocks.getSelf().getBlock(blockID);
                     Arrays.fill(alphaNeighbours, false);
 
@@ -120,9 +118,8 @@ public class SubChunk {
                             SubChunk neighbourSubChunk = neighbourChunk.getSubChunk(nChunkY);
                             if (neighbourSubChunk != null) {
                                 int neighbourIndex = nz * SIZE + ny * WIDTH + nx;
-                                short neighbourBlockNum = neighbourSubChunk.blocks[neighbourIndex];
-                                short neighbourBlockID = (short) ((neighbourBlockNum >>> 4) & 0x0FFF);
-                                alphaNeighbours[side] = Blocks.getSelf().getBlock(neighbourBlockID).hasAlfa;
+                                short neighbourBlock = neighbourSubChunk.blocks[neighbourIndex];
+                                alphaNeighbours[side] = Blocks.getSelf().getBlock(neighbourBlock).hasAlfa;
                             } else {
                                 alphaNeighbours[side] = true;
                             }
@@ -156,9 +153,10 @@ public class SubChunk {
             }
         }
 
-        if(vertices.size() == 1) {
+        if(vertices.isEmpty()) {
             isEmpty = true;
         } else {
+            isEmpty = false;
             mesh.destroy();
             mesh = new ChunkMesh(vertices.toArray(new ChunkVertex[0]), indices.stream().mapToInt(i -> i).toArray());
             mesh.create();
@@ -193,138 +191,18 @@ public class SubChunk {
 
     }
 
-    public static int cordsToIndex(int x, int y, int z) {
-        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
-            return -1;
-        return z * (SIZE) + y * WIDTH + x;
-    }
-
     public short getBlock(int x, int y, int z) {
-        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
-            return -1;
-        return blocks[z * (SIZE) + y * WIDTH + x];
-    }
-
-    public short getBlock(int i) {
-        if(i < 0 || i > SIZE)
-            return -1;
-        return blocks[i];
-    }
-
-    public short getBlockId(int x, int y, int z) {
         if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH) {
             return -1;
         }
-        return (short) ((blocks[z * (SIZE) + y * WIDTH + x] >>> 4) & 0x0FFF);
-    }
-
-    public short getBlockId(int i) {
-        if(i < 0 || i > SIZE)
-            return -1;
-        return (short) ((blocks[i] >>> 4) & 0x0FFF);
-    }
-
-    public short getBlockState(int x, int y, int z) {
-        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
-            return -1;
-        return (short) ((blocks[z * (SIZE) + y * WIDTH + x] & 0x0F));
-    }
-
-    public byte getBlockState(int i) {
-        if(i < 0 || i > SIZE)
-            return -1;
-        return (byte) (blocks[i] & 0x0F);
-    }
-
-    public void setBlock(short block, int i) {
-        if(i < 0 || i > SIZE)
-            return;
-        blocks[i] = block;
-    }
-
-    public void setBlock(short block, int x, int y, int z) {
-        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
-            return;
-        blocks[z * (SIZE) + y * WIDTH + x] = block;
-    }
-
-    public void setBlock(short id, byte state, int i) {
-        if(i < 0 || i > SIZE)
-            return;
-        blocks[i] = (short) ((id << 4) | state & 0x0F);
-    }
-
-    public void setBlock(short id, byte state, int x, int y, int z) {
-        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH)
-            return;
-        blocks[z * (SIZE) + y * WIDTH + x] = (short) ((id << 4) | state & 0x0F);
-    }
-
-
-    public static int cordsToIndexChecked(int x, int y, int z) {
-        if (x > WIDTH || x < 0 || y > HEIGHT || y < 0 || z > WIDTH || z < 0)
-            throw new IllegalArgumentException("Can`t get index of block XYZ: " + x + " / " + y + " / " + " / " + z + " (cords out of bounds)");
-        return z * (SIZE) + y * WIDTH + x;
-    }
-
-    public short getBlockChecked(int x, int y, int z) {
-        if (x > WIDTH || x < 0 || y > HEIGHT || y < 0 || z > WIDTH || z < 0)
-            throw new IllegalArgumentException("Can`t get index of block XYZ: " + x + " / " + y + " / " + " / " + z + " (cords out of bounds)");
         return blocks[z * (SIZE) + y * WIDTH + x];
     }
 
-    public short getBlockChecked(int i) {
-        if (i > SIZE)
-            throw new IllegalArgumentException("Block i: " + i + " incorrect (cords out of bounds)");
-        return blocks[i];
-    }
-
-    public short getBlockIdChecked(int x, int y, int z) {
-        if (x > WIDTH || x < 0 || y > HEIGHT || y < 0 || z > WIDTH || z < 0)
-            throw new IllegalArgumentException("Can`t get index of block XYZ: " + x + " / " + y + " / " + " / " + z + " (cords out of bounds)");
-        return (short) ((blocks[z * (SIZE) + y * WIDTH + x] >>> 4) & 0x0FFF);
-    }
-
-    public short getBlockIdChecked(int i) {
-        if (i > SIZE)
-            throw new IllegalArgumentException("Block i: " + i + " incorrect (cords out of bounds)");
-        return (short) ((blocks[i] >>> 4) & 0x0FFF);
-    }
-
-    public short getBlockStateChecked(int x, int y, int z) {
-        if (x > WIDTH || x < 0 || y > HEIGHT || y < 0 || z > WIDTH || z < 0)
-            throw new IllegalArgumentException("Can`t get index of block XYZ: " + x + " / " + y + " / " + " / " + z + " (cords out of bounds)");
-        return (short) ((blocks[z * (SIZE) + y * WIDTH + x] >>> 4) & 0x0FFF);
-    }
-
-    public byte getBlockStateChecked(int i) {
-        if (i > SIZE)
-            throw new IllegalArgumentException("Block i: " + i + " incorrect (cords out of bounds)");
-        return (byte) (blocks[i] & 0x0F);
-    }
-
-    public void setBlockChecked(short block, int i) {
-        if (i > SIZE)
-            throw new IllegalArgumentException("Block i: " + i + " incorrect (cords out of bounds)");
-        blocks[i] = block;
-    }
-
-    public void setBlockChecked(short block, int x, int y, int z) {
-        if (x > WIDTH || x < 0 || y > HEIGHT || y < 0 || z > WIDTH || z < 0)
-            throw new IllegalArgumentException("Can`t get index of block XYZ: " + x + " / " + y + " / " + " / " + z + " (cords out of bounds)");
+    public void setBlock(short block, int x, int y, int z) {
+        if(x < 0 || x > WIDTH || y < 0 || y > HEIGHT || z < 0 || z > WIDTH) {
+            return;
+        }
         blocks[z * (SIZE) + y * WIDTH + x] = block;
-    }
-
-    public void setBlockChecked(short id, byte state, int i) {
-        if (i > SIZE)
-            throw new IllegalArgumentException("Block i: " + i + " incorrect (cords out of bounds)");
-        blocks[i] = (short) ((id << 4) | state & 0x0F);
-    }
-
-    public void setBlockChecked(short id, byte state, int x, int y, int z) {
-        if (x > WIDTH || x < 0 || y > HEIGHT || y < 0 || z > WIDTH || z < 0)
-            throw new IllegalArgumentException("Can`t get index of block XYZ: " + x + " / " + y + " / " + " / " + z + " (cords out of bounds)");
-        blocks[z * (SIZE) + y * WIDTH + x] = (short) ((id << 4) | state & 0x0F);
     }
 
 
