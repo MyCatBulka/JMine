@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -33,6 +34,11 @@ public class ChunkMesh {
         if(vertices == null || indices == null){
             return;
         }
+        IntBuffer indicesBuffer = MemoryUtils.arrayToIntBuffer(indices);
+        ibo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ibo);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
+
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
 
@@ -44,6 +50,7 @@ public class ChunkMesh {
         }
         FloatBuffer positionBuffer = MemoryUtils.arrayToFloatBuffer(positionData);
         pbo = storeData(positionBuffer, 0, 3, GL11.GL_FLOAT);
+        MemoryUtil.memFree(positionBuffer);
 
         float[] textureData = new float[vertices.length * 2];
         for (int i = 0; i < vertices.length; i++) {
@@ -52,6 +59,7 @@ public class ChunkMesh {
         }
         FloatBuffer textureCoordsBuffer = MemoryUtils.arrayToFloatBuffer(textureData);
         tbo = storeData(textureCoordsBuffer, 1, 2, GL11.GL_FLOAT);
+        MemoryUtil.memFree(textureCoordsBuffer);
 
         float[] lightData = new float[vertices.length];
         for (int i = 0; i < vertices.length; i++) {
@@ -59,18 +67,10 @@ public class ChunkMesh {
         }
         FloatBuffer lightBuffer = MemoryUtils.arrayToFloatBuffer(lightData);
         lbo = storeData(lightBuffer, 2, 1, GL11.GL_FLOAT);
+        MemoryUtil.memFree(lightBuffer);
 
-        if (indices != null) {
-            IntBuffer indicesBuffer = MemoryUtils.arrayToIntBuffer(indices);
-            ibo = GL15.glGenBuffers();
-            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ibo);
-            GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
-            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-        } else {
-            ibo = 0;
-        }
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
-
     }
 
     private int storeData(FloatBuffer buffer, int index, int size, int type) {
@@ -110,13 +110,33 @@ public class ChunkMesh {
         return lbo;
     }
 
-    public void destroy(){
-        GL15.glDeleteBuffers(pbo);
-        GL15.glDeleteBuffers(ibo);
-        GL15.glDeleteBuffers(tbo);
-        GL15.glDeleteBuffers(lbo);
+    public void destroy() {
+        GL30.glBindVertexArray(0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
-        GL30.glDeleteVertexArrays(vao);
+        if (pbo != 0) {
+            GL15.glDeleteBuffers(pbo);
+            pbo = 0;
+        }
+        if (ibo != 0) {
+            GL15.glDeleteBuffers(ibo);
+            ibo = 0;
+        }
+        if (tbo != 0) {
+            GL15.glDeleteBuffers(tbo);
+            tbo = 0;
+        }
+        if (lbo != 0) {
+            GL15.glDeleteBuffers(lbo);
+            lbo = 0;
+        }
+        if (vao != 0) {
+            GL30.glDeleteVertexArrays(vao);
+            vao = 0;
+        }
+
+        vertices = null;
+        indices = null;
     }
 
     public void setVertices(ChunkVertex[] vertices) {

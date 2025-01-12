@@ -27,19 +27,13 @@ import java.util.logging.Logger;
 public class WorldProvider {
     private Logger logger = Logger.getLogger(WorldProvider.class.getName());
     private World world;
-    private Matrix4f lookAtMatrix = new Matrix4f();
-    private FloatBuffer lookAtMatrixBuffer;
-    private BasicLinesMesh lookAtMesh = new BasicLinesMesh();
-    private boolean isLookingAtBlock = false;
-    private Vector3i lookingAtBlockCords = new Vector3i();
-    private short lookingAtBlockID = 0;
-    private Block lookingAtBlockBlock = null;
-    private Face lookingAtBlockFace = null;
-    private int lookingDistance = 5;
+    private HintRenderer hintRenderer;
 
     public void init() {
         world = new World();
         world.init();
+        hintRenderer = new HintRenderer();
+        hintRenderer.init();
         generate();
     }
 
@@ -84,13 +78,6 @@ public class WorldProvider {
     }
 
     public void generateChunk(Chunk chunk) {
-//        for (int x = 0; x < Chunk.WIDTH; x++) {
-//            for (int z = 0; z < Chunk.WIDTH; z++) {
-//                for (int y = 0; y < 10; y++) {
-//                    chunk.setBlock((short) 2, (byte) 0, x, y, z);
-//                }
-//            }
-//        }
         Random random = new Random(chunk.getChunkX() * 31L + chunk.getChunkZ() * 17L);
         for (int x = 0; x < Chunk.WIDTH; x++) {
             for (int z = 0; z < Chunk.WIDTH; z++) {
@@ -103,396 +90,84 @@ public class WorldProvider {
         }
     }
 
-    public void moveChunks(int offsetX, int offsetZ) {
-        //TODO !!NOT WORKING
-        if (offsetX == 0 && offsetZ == 0) {
-            return;
-        }
-
-        int renderDistance = world.getRenderDistance();
-        Chunk[][] newChunks = new Chunk[renderDistance][renderDistance];
-
-        for (int x = 0; x < renderDistance; x++) {
-            for (int z = 0; z < renderDistance; z++) {
-                int newX = x - offsetX;
-                int newZ = z - offsetZ;
-
-                if (newX >= 0 && newX < renderDistance && newZ >= 0 && newZ < renderDistance) {
-                    newChunks[newX][newZ] = world.chunks[x][z];
-                    newChunks[newX][newZ].addPosition(offsetX, offsetZ);
-                    newChunks[newX][newZ].setChunkX(newX - renderDistance / 2);
-                    newChunks[newX][newZ].setChunkZ(newZ - renderDistance / 2);
-                }
+        public void moveChunks(int offsetX, int offsetZ) {
+            if (offsetX == 0 && offsetZ == 0) {
+                return;
             }
-        }
 
-        for (int x = 0; x < renderDistance; x++) {
-            for (int z = 0; z < renderDistance; z++) {
-                if (newChunks[x][z] == null) {
-                    int chunkWorldX = x - renderDistance / 2;
-                    int chunkWorldZ = z - renderDistance / 2;
+            int renderDistance = world.getRenderDistance();
+            Chunk[][] newChunks = new Chunk[renderDistance][renderDistance];
 
-                    Chunk newChunk = new Chunk(chunkWorldX, chunkWorldZ, world);
-                    newChunk.create();
-                    generateChunk(newChunk);
-                    newChunks[x][z] = newChunk;
-                    newChunk.updateMeshes();
-                }
-            }
-        }
+            for (int x = 0; x < renderDistance; x++) {
+                for (int z = 0; z < renderDistance; z++) {
+                    int newX = x - offsetX;
+                    int newZ = z - offsetZ;
 
-        world.chunks = newChunks;
-    }
-
-    public void checkLookingAtBlock() {
-        isLookingAtBlock = false;
-        lookingAtBlockBlock = null;
-        lookingAtBlockID = -1;
-        Vector3f rayPos = new Vector3f(Hero.getSelf().getPosition());
-        Vector3f rayDir = new Vector3f(Hero.getSelf().getDirection());
-        float step = Face.BLOCK_TEXTURE_WIDTH_FLOAT;
-
-        for (float distance = 0f; distance <= lookingDistance; distance += step) {
-            int blockX = (int) Math.floor(rayPos.x);
-            int blockY = (int) Math.floor(rayPos.y);
-            int blockZ = (int) Math.floor(rayPos.z);
-            short currentBlock = world.getBlock(blockX, blockY, blockZ);
-            if (currentBlock != -1) {
-                Block block = Blocks.getSelf().getBlock(currentBlock);
-                if (block.isFocusable()) {
-                    setLookAtBlock(currentBlock, blockX, blockY, blockZ);
-
-                    int faceLookingAt = getFaceLookingAt(rayPos, blockX, blockY, blockZ);
-                    if (faceLookingAt != -1)
-                        lookingAtBlockFace = block.getSide(faceLookingAt);
-                    else
-                        lookingAtBlockFace = null;
-                    isLookingAtBlock = true;
-                    return;
+                    if (newX >= 0 && newX < renderDistance && newZ >= 0 && newZ < renderDistance) {
+                        newChunks[newX][newZ] = world.chunks[x][z];
+                        newChunks[newX][newZ].setChunkX(newX - renderDistance / 2);
+                        newChunks[newX][newZ].setChunkZ(newZ - renderDistance / 2);
+                        newChunks[newX][newZ].updateMatrices();
+                    }
                 }
             }
 
-            rayPos.add(new Vector3f(rayDir).mul(step));
+            for (int x = 0; x < renderDistance; x++) {
+                for (int z = 0; z < renderDistance; z++) {
+                    if (newChunks[x][z] == null) {
+                        int chunkWorldX = x - renderDistance / 2;
+                        int chunkWorldZ = z - renderDistance / 2;
+
+                        Chunk newChunk = new Chunk(chunkWorldX, chunkWorldZ, world);
+                        newChunk.create();
+                        generateChunk(newChunk);
+                        newChunks[x][z] = newChunk;
+                        newChunk.setNeedUpdateMeshes(true);
+
+                        Chunk neighChunk;
+                        if(x != 0) {
+                            neighChunk = newChunks[x - 1][z];
+                            if (neighChunk != null)
+                                neighChunk.setNeedUpdateMeshes(true);
+                        }
+                        if(x != renderDistance -1) {
+                            neighChunk = newChunks[x + 1][z];
+                            if (neighChunk != null)
+                                neighChunk.setNeedUpdateMeshes(true);
+                        }
+                        if(z != 0) {
+                            neighChunk = newChunks[x][z - 1];
+                            if (neighChunk != null)
+                                neighChunk.setNeedUpdateMeshes(true);
+                        }
+                        if(z != renderDistance -1) {
+                            neighChunk = newChunks[x][z+1];
+                            if(neighChunk != null)
+                                neighChunk.setNeedUpdateMeshes(true);
+                        }
+                    }
+                }
+            }
+
+            world.chunks = newChunks;
         }
-    }
-
-    private int getFaceLookingAt(Vector3f hitPoint, int blockX, int blockY, int blockZ) {
-        float epsilon = Face.BLOCK_TEXTURE_WIDTH_FLOAT;
-        if (Math.abs(hitPoint.x - blockX) < epsilon) {
-            return 2;
-        } else if (Math.abs(hitPoint.x - (blockX + 1)) < epsilon) {
-            return 3;
-        } else if (Math.abs(hitPoint.y - blockY) < epsilon) {
-            return 5;
-        } else if (Math.abs(hitPoint.y - (blockY + 1)) < epsilon) {
-            return 4;
-        } else if (Math.abs(hitPoint.z - blockZ) < epsilon) {
-            return 1;
-        } else if (Math.abs(hitPoint.z - (blockZ + 1)) < epsilon) {
-            return 0;
-        }
-
-        return -1;
-    }
-
-    private static boolean isRayIntersectingBlock(Vector3f rayPos, Vector3f rayDir, Block block) {
-        float blockMinX = block.getxMin();
-        float blockMaxX = block.getxMax();
-        float blockMinY = block.getyMin();
-        float blockMaxY = block.getyMax();
-        float blockMinZ = block.getzMin();
-        float blockMaxZ = block.getzMax();
-
-        return checkIntersection(rayPos, rayDir, blockMinX, blockMaxX, blockMinY, blockMaxY, blockMinZ, blockMaxZ);
-    }
-
-    private static boolean checkIntersection(Vector3f rayPos, Vector3f rayDir,
-                                             float minX, float maxX,
-                                             float minY, float maxY,
-                                             float minZ, float maxZ) {
-        float tMin = (minX - rayPos.x) / rayDir.x;
-        float tMax = (maxX - rayPos.x()) / rayDir.x;
-        if (tMin > tMax) {
-            float temp = tMin;
-            tMin = tMax;
-            tMax = temp;
-        }
-
-        float tYMin = (minY - rayPos.y) / rayDir.y;
-        float tYMax = (maxY - rayPos.y) / rayDir.y;
-        if (tYMin > tYMax) {
-            float temp = tYMin;
-            tYMin = tYMax;
-            tYMax = temp;
-        }
-
-        if ((tMin > tYMax) || (tYMin > tMax)) return false;
-        tMin = Math.max(tMin, tYMin);
-        tMax = Math.min(tMax, tYMax);
-
-        float tZMin = (minZ - rayPos.z) / rayDir.z;
-        float tZMax = (maxZ - rayPos.z) / rayDir.z;
-        if (tZMin > tZMax) {
-            float temp = tZMin;
-            tZMin = tZMax;
-            tZMax = temp;
-        }
-
-        if ((tMin > tZMax) || (tZMin > tMax)) return false;
-        tMin = Math.max(tMin, tZMin);
-        tMax = Math.min(tMax, tZMax);
-
-        return tMax >= 0;
-    }
 
 
     public void update() {
         world.update();
-
-        checkLookingAtBlock();
+        hintRenderer.update();
     }
 
     public void render() {
         world.render();
-        if (isLookingAtBlock) {
-            renderLookAt();
-        }
+        hintRenderer.render();
     }
 
     public void destroy() {
         world.destroy();
-        lookAtMesh.destroy();
+        hintRenderer.destroy();
     }
 
-    public void renderLookAt() {
-        GL30.glBindVertexArray(lookAtMesh.getVAO());
-        GL30.glEnableVertexAttribArray(0);
-        ShaderManager.getSelf().getLookAtBlockShader().bind();
-        GL11.glDrawArrays(GL11.GL_LINES, 0, lookAtMesh.getVertices().length);
-        ShaderManager.getSelf().getLookAtBlockShader().unBind();
-
-        GL30.glDisableVertexAttribArray(0);
-        GL30.glBindVertexArray(0);
-    }
-
-    public void setLookAtBlock(short id, int x, int y, int z) {
-        if(x == lookingAtBlockCords.x && y == lookingAtBlockCords.y && z == lookingAtBlockCords.z)
-            return;
-        lookingAtBlockBlock = Blocks.getSelf().getBlock(id);
-        if (lookingAtBlockCords.x != x || lookingAtBlockCords.y != y || lookingAtBlockCords.z != z || lookingAtBlockID != id) {
-            Block block = Blocks.getSelf().getBlock(id);
-            List<Vector3f> vertices = new ArrayList<>();
-            float offset = 0.003f;
-            Vector3f vec0;
-            Vector3f vec1;
-            Vector3f vec2;
-            Vector3f vec3;
-            for (int i = 0; i < block.getSides().length; i++) {
-                switch (i) {
-                    case 0: {
-                        vec0 = new Vector3f(
-                                block.getSide(i).getFace()[0].getX() - offset,
-                                block.getSide(i).getFace()[0].getY() - offset,
-                                block.getSide(i).getFace()[0].getZ() + offset
-                        );
-                        vec1 = new Vector3f(
-                                block.getSide(i).getFace()[1].getX() + offset,
-                                block.getSide(i).getFace()[1].getY() - offset,
-                                block.getSide(i).getFace()[1].getZ() + offset
-                        );
-                        vec2 = new Vector3f(
-                                block.getSide(i).getFace()[2].getX() + offset,
-                                block.getSide(i).getFace()[2].getY() + offset,
-                                block.getSide(i).getFace()[2].getZ() + offset
-                        );
-                        vec3 = new Vector3f(
-                                block.getSide(i).getFace()[3].getX() - offset,
-                                block.getSide(i).getFace()[3].getY() + offset,
-                                block.getSide(i).getFace()[3].getZ() + offset
-                        );
-                        vertices.add(vec0);
-                        vertices.add(vec1);
-                        vertices.add(vec1);
-                        vertices.add(vec2);
-                        vertices.add(vec2);
-                        vertices.add(vec3);
-                        vertices.add(vec3);
-                        vertices.add(vec0);
-                        break;
-                    }
-                    case 1: {
-                        vec0 = new Vector3f(
-                                block.getSide(i).getFace()[3].getX() - offset,
-                                block.getSide(i).getFace()[3].getY() - offset,
-                                block.getSide(i).getFace()[3].getZ() - offset
-                        );
-                        vec1 = new Vector3f(
-                                block.getSide(i).getFace()[2].getX() + offset,
-                                block.getSide(i).getFace()[2].getY() - offset,
-                                block.getSide(i).getFace()[2].getZ() - offset
-                        );
-                        vec2 = new Vector3f(
-                                block.getSide(i).getFace()[1].getX() + offset,
-                                block.getSide(i).getFace()[1].getY() + offset,
-                                block.getSide(i).getFace()[1].getZ() - offset
-                        );
-                        vec3 = new Vector3f(
-                                block.getSide(i).getFace()[0].getX() - offset,
-                                block.getSide(i).getFace()[0].getY() + offset,
-                                block.getSide(i).getFace()[0].getZ() - offset
-                        );
-                        vertices.add(vec0);
-                        vertices.add(vec1);
-                        vertices.add(vec1);
-                        vertices.add(vec2);
-                        vertices.add(vec2);
-                        vertices.add(vec3);
-                        vertices.add(vec3);
-                        vertices.add(vec0);
-                        break;
-                    }
-                    case 2: {
-                        vec0 = new Vector3f(
-                                block.getSide(i).getFace()[0].getX() - offset,
-                                block.getSide(i).getFace()[0].getY() - offset,
-                                block.getSide(i).getFace()[0].getZ() - offset
-                        );
-                        vec1 = new Vector3f(
-                                block.getSide(i).getFace()[1].getX() - offset,
-                                block.getSide(i).getFace()[1].getY() - offset,
-                                block.getSide(i).getFace()[1].getZ() + offset
-                        );
-                        vec2 = new Vector3f(
-                                block.getSide(i).getFace()[2].getX() - offset,
-                                block.getSide(i).getFace()[2].getY() + offset,
-                                block.getSide(i).getFace()[2].getZ() + offset
-                        );
-                        vec3 = new Vector3f(
-                                block.getSide(i).getFace()[3].getX() - offset,
-                                block.getSide(i).getFace()[3].getY() + offset,
-                                block.getSide(i).getFace()[3].getZ() - offset
-                        );
-                        vertices.add(vec0);
-                        vertices.add(vec1);
-                        vertices.add(vec1);
-                        vertices.add(vec2);
-                        vertices.add(vec2);
-                        vertices.add(vec3);
-                        vertices.add(vec3);
-                        vertices.add(vec0);
-                        break;
-                    }
-                    case 3: {
-                        vec0 = new Vector3f(
-                                block.getSide(i).getFace()[3].getX() + offset,
-                                block.getSide(i).getFace()[3].getY() - offset,
-                                block.getSide(i).getFace()[3].getZ() - offset
-                        );
-                        vec1 = new Vector3f(
-                                block.getSide(i).getFace()[2].getX() + offset,
-                                block.getSide(i).getFace()[2].getY() - offset,
-                                block.getSide(i).getFace()[2].getZ() + offset
-                        );
-                        vec2 = new Vector3f(
-                                block.getSide(i).getFace()[1].getX() + offset,
-                                block.getSide(i).getFace()[1].getY() + offset,
-                                block.getSide(i).getFace()[1].getZ() + offset
-                        );
-                        vec3 = new Vector3f(
-                                block.getSide(i).getFace()[0].getX() + offset,
-                                block.getSide(i).getFace()[0].getY() + offset,
-                                block.getSide(i).getFace()[0].getZ() - offset
-                        );
-                        vertices.add(vec0);
-                        vertices.add(vec1);
-                        vertices.add(vec1);
-                        vertices.add(vec2);
-                        vertices.add(vec2);
-                        vertices.add(vec3);
-                        vertices.add(vec3);
-                        vertices.add(vec0);
-                        break;
-                    }
-                    case 4: {
-                        vec0 = new Vector3f(
-                                block.getSide(i).getFace()[0].getX() - offset,
-                                block.getSide(i).getFace()[0].getY() + offset,
-                                block.getSide(i).getFace()[0].getZ() + offset
-                        );
-                        vec1 = new Vector3f(
-                                block.getSide(i).getFace()[1].getX() + offset,
-                                block.getSide(i).getFace()[1].getY() + offset,
-                                block.getSide(i).getFace()[1].getZ() + offset
-                        );
-                        vec2 = new Vector3f(
-                                block.getSide(i).getFace()[2].getX() + offset,
-                                block.getSide(i).getFace()[2].getY() + offset,
-                                block.getSide(i).getFace()[2].getZ() - offset
-                        );
-                        vec3 = new Vector3f(
-                                block.getSide(i).getFace()[3].getX() - offset,
-                                block.getSide(i).getFace()[3].getY() + offset,
-                                block.getSide(i).getFace()[3].getZ() - offset
-                        );
-                        vertices.add(vec0);
-                        vertices.add(vec1);
-                        vertices.add(vec1);
-                        vertices.add(vec2);
-                        vertices.add(vec2);
-                        vertices.add(vec3);
-                        vertices.add(vec3);
-                        vertices.add(vec0);
-                        break;
-                    }
-                    case 5: {
-                        vec0 = new Vector3f(
-                                block.getSide(i).getFace()[3].getX() - offset,
-                                block.getSide(i).getFace()[3].getY() - offset,
-                                block.getSide(i).getFace()[3].getZ() + offset
-                        );
-                        vec1 = new Vector3f(
-                                block.getSide(i).getFace()[2].getX() + offset,
-                                block.getSide(i).getFace()[2].getY() - offset,
-                                block.getSide(i).getFace()[2].getZ() + offset
-                        );
-                        vec2 = new Vector3f(
-                                block.getSide(i).getFace()[1].getX() + offset,
-                                block.getSide(i).getFace()[1].getY() - offset,
-                                block.getSide(i).getFace()[1].getZ() - offset
-                        );
-                        vec3 = new Vector3f(
-                                block.getSide(i).getFace()[0].getX() - offset,
-                                block.getSide(i).getFace()[0].getY() - offset,
-                                block.getSide(i).getFace()[0].getZ() - offset
-                        );
-                        vertices.add(vec0);
-                        vertices.add(vec1);
-                        vertices.add(vec1);
-                        vertices.add(vec2);
-                        vertices.add(vec2);
-                        vertices.add(vec3);
-                        vertices.add(vec3);
-                        vertices.add(vec0);
-                        break;
-                    }
-
-                }
-            }
-            lookAtMesh = new BasicLinesMesh(vertices.toArray(new Vector3f[0]));
-            lookAtMesh.destroy();
-            lookAtMesh.create();
-
-            lookAtMatrix.identity();
-            lookAtMatrix.translate(x, y, z);
-            ShaderManager.getSelf().getLookAtBlockShader().bind();
-            lookAtMatrixBuffer = MemoryUtil.memAllocFloat(16);
-            lookAtMatrix.get(lookAtMatrixBuffer);
-            ShaderManager.getSelf().getLookAtBlockShader().setUniformMat4f("worldPosMat", lookAtMatrixBuffer);
-            ShaderManager.getSelf().getLookAtBlockShader().unBind();
-            lookingAtBlockCords.set(x, y, z);
-            lookingAtBlockID = id;
-        }
-    }
 
     public void setBlockAndUpdateMeshes(short id, int x, int y, int z) {
         if (x < -world.getBlocksWidth() / 2 || x >= world.getBlocksWidth() / 2 || y < 0 || y >= Chunk.HEIGHT || z < -world.getBlocksWidth() / 2 || z >= world.getBlocksWidth() / 2)
@@ -572,35 +247,7 @@ public class WorldProvider {
         return world;
     }
 
-    public int getLookingDistance() {
-        return lookingDistance;
-    }
-
-    public short getLookingAtBlockID() {
-        return lookingAtBlockID;
-    }
-
-    public Vector3i getLookingAtBlockCords() {
-        return lookingAtBlockCords;
-    }
-
-    public boolean isLookingAtBlock() {
-        return isLookingAtBlock;
-    }
-
-    public Matrix4f getLookAtMatrix() {
-        return lookAtMatrix;
-    }
-
-    public BasicLinesMesh getLookAtMesh() {
-        return lookAtMesh;
-    }
-
-    public Face getLookingAtBlockFace() {
-        return lookingAtBlockFace;
-    }
-
-    public Block getLookingAtBlockBlock() {
-        return lookingAtBlockBlock;
+    public HintRenderer getHintRenderer() {
+        return hintRenderer;
     }
 }

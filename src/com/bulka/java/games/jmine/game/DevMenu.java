@@ -72,11 +72,12 @@ public class DevMenu {
                 textUpdateperiodStart = System.currentTimeMillis();
                 updateValues();
                 textLeft = String.format(Locale.US,
-                        "JMine %s\nFPS: %s; Time: %.1fs\nDelta time: %.4fms, Update: %.4fms, Render: %.4fms\nXYZ: %.3f / %.3f / %.3f; p:%.1f; y:%.1f",
+                        "JMine %s\nFPS: %s; Time: %.1fs\nDelta time: %.4fms, Update: %.4fms, Render: %.4fms\nIn Chunk XYZ: %.3f / %.3f / %.3f; p:%.1f; y:%.1f\nGlobal XYZ: %.3f / %.3f / %.3f",
                         Engine.VERSION,
                         Engine.getEngine().getFPS(), GLFW.glfwGetTime(),
                         deltaTime, updateTime, renderTime,
-                        Hero.getSelf().getPosition().x, Hero.getSelf().getPosition().y, Hero.getSelf().getPosition().z, Hero.getSelf().getRotation().x, Hero.getSelf().getRotation().y
+                        Hero.getSelf().getPosition().x, Hero.getSelf().getPosition().y, Hero.getSelf().getPosition().z, Hero.getSelf().getRotation().x, Hero.getSelf().getRotation().y,
+                        Hero.getSelf().getGlobalPosition().x, Hero.getSelf().getGlobalPosition().y, Hero.getSelf().getGlobalPosition().z
 
                 );
                 textRight = String.format("Java %s %s\nHeap memory Allocated: %dMB; Used: %dMB; Free: %dMB; MAX: %dMB\nNative memory Used: %dMB, Commited: %dMB, Free: %dMB\nAll memory Used: %dMB, Allocated: %dMB\n\nDisplay: %dx%d\n%s (%s)",

@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -36,8 +37,9 @@ public class SubChunk {
     private ChunkMesh mesh;
     private Matrix4f worldPositionMatrix;
     private FloatBuffer worldPositionBuffer;
-    private boolean isEmpty = false;
+    private boolean isEmpty = true;
     private static int renderMethod = GL11.GL_TRIANGLES;
+    private boolean needUpdateMesh = false;
 
     public SubChunk() {
 
@@ -68,18 +70,29 @@ public class SubChunk {
         mesh = new ChunkMesh();
         mesh.create();
         worldPositionMatrix = new Matrix4f();
+        worldPositionMatrix.identity();
+        worldPositionMatrix = worldPositionMatrix.translate(startBlockX, startBlockY, startBlockZ);
+        worldPositionBuffer = Shader.matrix4fToBuffer(worldPositionMatrix);
     }
 
     public void update() {
+        if(needUpdateMesh) {
+            updateMesh();
+            needUpdateMesh = false;
+        }
+    }
 
+    public void updateMatrix(){
+        worldPositionMatrix.identity();
+        worldPositionMatrix = worldPositionMatrix.translate(startBlockX, startBlockY, startBlockZ);
+        MemoryUtil.memFree(worldPositionBuffer);
+        worldPositionBuffer = Shader.matrix4fToBuffer(worldPositionMatrix);
     }
 
     public void updateMesh() {
         List<ChunkVertex> vertices = new ArrayList<>();
         List<Integer> indices = new ArrayList<>();
-        worldPositionMatrix.identity();
-        worldPositionMatrix = worldPositionMatrix.translate(startBlockX, startBlockY, startBlockZ);
-        worldPositionBuffer = Shader.matrix4fToBuffer(worldPositionMatrix);
+        updateMatrix();
         int faceIndex = 0;
         boolean[] alphaNeighbours = new boolean[6];
         for (int x = 0; x < WIDTH; x++) {
@@ -164,7 +177,7 @@ public class SubChunk {
     }
 
     public void render() {
-        if(!isEmpty) {
+        if (!isEmpty) {
             GL30.glBindVertexArray(mesh.getVAO());
             GL30.glEnableVertexAttribArray(0);
             GL30.glEnableVertexAttribArray(1);
@@ -212,6 +225,7 @@ public class SubChunk {
 
     public void setChunkX(int chunkX) {
         this.chunkX = chunkX;
+        startBlockX = chunkX * WIDTH;
     }
 
     public int getChunkY() {
@@ -220,6 +234,7 @@ public class SubChunk {
 
     public void setChunkY(int chunkY) {
         this.chunkY = chunkY;
+        startBlockY = chunkY * HEIGHT;
     }
 
     public int getChunkZ() {
@@ -228,6 +243,7 @@ public class SubChunk {
 
     public void setChunkZ(int chunkZ) {
         this.chunkZ = chunkZ;
+        startBlockZ = chunkZ * WIDTH;
     }
 
     public Chunk getChunk() {
@@ -276,5 +292,13 @@ public class SubChunk {
 
     public static void setRenderMethod(int renderMethod) {
         SubChunk.renderMethod = renderMethod;
+    }
+
+    public boolean isNeedUpdateMesh() {
+        return needUpdateMesh;
+    }
+
+    public void setNeedUpdateMesh(boolean needUpdateMesh) {
+        this.needUpdateMesh = needUpdateMesh;
     }
 }

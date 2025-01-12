@@ -12,6 +12,7 @@ public class Chunk {
     public int startX = 0;
     public int startZ = 0;
     public SubChunk[] subChunks;
+    private boolean needUpdateMeshes = false;
 
     public Chunk() {
 
@@ -41,7 +42,7 @@ public class Chunk {
         }
     }
 
-    public void translate(int x, int z){
+    public void setPosition(int x, int z){
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].getWorldPositionMatrix().identity();
             subChunks[i].getWorldPositionMatrix().translate(x, 0, z);
@@ -54,6 +55,10 @@ public class Chunk {
     }
 
     public void update() {
+        if(needUpdateMeshes) {
+            updateMeshes();
+            needUpdateMeshes = false;
+        }
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].update();
         }
@@ -74,6 +79,11 @@ public class Chunk {
     public void updateMeshes(){
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].updateMesh();
+        }
+    }
+    public void updateMatrices(){
+        for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
+            subChunks[i].updateMatrix();
         }
     }
 
@@ -105,6 +115,7 @@ public class Chunk {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].setChunkX(chunkX);
         }
+        startX = chunkX * WIDTH;
     }
 
     public int getChunkZ() {
@@ -116,6 +127,7 @@ public class Chunk {
         for (int i = 0; i < NUM_SUB_CHUNKS; i++) {
             subChunks[i].setChunkZ(chunkZ);
         }
+        startZ = chunkZ * WIDTH;
     }
 
     public World getWorld() {
@@ -136,5 +148,21 @@ public class Chunk {
 
     public SubChunk[] getSubChunks() {
         return subChunks;
+    }
+
+    public boolean isNeedUpdateMeshes() {
+        return needUpdateMeshes;
+    }
+
+    public void setNeedUpdateMeshes(boolean needUpdateMeshes) {
+        this.needUpdateMeshes = needUpdateMeshes;
+    }
+
+    public void setStartX(int startX) {
+        this.startX = startX;
+    }
+
+    public void setStartZ(int startZ) {
+        this.startZ = startZ;
     }
 }

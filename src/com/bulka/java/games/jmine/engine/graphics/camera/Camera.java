@@ -6,6 +6,7 @@ import com.bulka.java.games.jmine.engine.io.Window;
 import com.bulka.java.games.jmine.settings.SettingsManager;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
 
@@ -40,6 +41,7 @@ public class Camera {
         ShaderManager.getSelf().getLookAtBlockShader().bind();
         ShaderManager.getSelf().getLookAtBlockShader().setUniformMat4f("projViewMat", buffer);
         ShaderManager.getSelf().getLookAtBlockShader().unBind();
+        MemoryUtil.memFree(buffer);
     }
 
     public void updateProjectionMatrix(){
