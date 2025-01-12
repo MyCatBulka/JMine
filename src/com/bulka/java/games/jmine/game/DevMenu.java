@@ -13,6 +13,9 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -36,6 +39,12 @@ public class DevMenu {
     private int used;
     private int free;
     private int maxMemory;
+    private int nonHeapMemoryUsed;
+    private int nonHeapCommitted;
+    private int nonHeapFree;
+    private int allocatedAll;
+    private int usedAll;
+    private MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();;
 
     public void init() {
 
@@ -64,16 +73,18 @@ public class DevMenu {
                 textUpdateperiodStart = System.currentTimeMillis();
                 updateValues();
                 textLeft = String.format(Locale.US,
-                        "JMine %s\nFPS: %s; Time: %.1fs\nDelta time: %.4fms, Update: %.4fms, Render: %.4fms\nXYZ:%.3f / %.3f / %.3f, p:%.1f; y:%.1f",
+                        "JMine %s\nFPS: %s; Time: %.1fs\nDelta time: %.4fms, Update: %.4fms, Render: %.4fms\nXYZ: %.3f / %.3f / %.3f; p:%.1f; y:%.1f",
                         Engine.VERSION,
                         Engine.getEngine().getFPS(), GLFW.glfwGetTime(),
                         deltaTime, updateTime, renderTime,
                         Hero.getSelf().getPosition().x, Hero.getSelf().getPosition().y, Hero.getSelf().getPosition().z, Hero.getSelf().getRotation().x, Hero.getSelf().getRotation().y
 
                 );
-                textRight = String.format("Java %s %s bit\nMemory Allocated: %dMB; Used: %dMB; Free: %dMB; MAX: %dMB\n\nDisplay: %dx%d\n%s (%s)",
+                textRight = String.format("Java %s %s\nHeap memory Allocated: %dMB; Used: %dMB; Free: %dMB; MAX: %dMB\nNative memory Used: %dMB, Commited: %dMB, Free: %dMB\nAll memory Used: %dMB, Allocated: %dMB\n\nDisplay: %dx%d\n%s (%s)",
                         JAVA_VERSION, System.getProperty("os.arch"),
                         allocated, used, free, maxMemory,
+                        nonHeapMemoryUsed, nonHeapCommitted, nonHeapFree,
+                        usedAll, allocatedAll,
                         Window.getSelf().getScreenWidth(), Window.getSelf().getScreenHeight(),
                         RENDERER, VENDOR
                 );
@@ -96,6 +107,16 @@ public class DevMenu {
         free = (int) (Runtime.getRuntime().freeMemory() / 1048576);
         maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1048576);
         used = allocated - free;
+
+
+
+        MemoryUsage nonHeapMemoryUsage = memoryMXBean.getNonHeapMemoryUsage();
+
+        nonHeapMemoryUsed = (int) (nonHeapMemoryUsage.getUsed() / 1048576);
+        nonHeapCommitted = (int) (nonHeapMemoryUsage.getCommitted() / 1048576);
+        nonHeapFree = nonHeapCommitted - nonHeapMemoryUsed;
+        allocatedAll = nonHeapCommitted + allocated;
+        usedAll = used + nonHeapMemoryUsed;
     }
 
     public void destroy() {

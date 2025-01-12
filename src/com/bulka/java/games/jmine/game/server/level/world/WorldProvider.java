@@ -1,5 +1,6 @@
 package com.bulka.java.games.jmine.game.server.level.world;
 
+import com.bulka.java.games.jmine.engine.Engine;
 import com.bulka.java.games.jmine.engine.graphics.camera.Hero;
 import com.bulka.java.games.jmine.engine.graphics.mesh.BasicLinesMesh;
 import com.bulka.java.games.jmine.engine.graphics.shaders.ShaderManager;
@@ -142,7 +143,7 @@ public class WorldProvider {
         isLookingAtBlock = false;
         Vector3f rayPos = new Vector3f(Hero.getSelf().getPosition());
         Vector3f rayDir = new Vector3f(Hero.getSelf().getDirection());
-        float step = 0.1f;
+        float step = 0.01f;
 
         for (float distance = 0f; distance <= lookingDistance; distance += step) {
             int blockX = (int) Math.floor(rayPos.x);
@@ -169,7 +170,7 @@ public class WorldProvider {
     }
 
     private int getFaceLookingAt(Vector3f hitPoint, int blockX, int blockY, int blockZ) {
-        float epsilon = 0.1f;
+        float epsilon = 0.01f;
         if (Math.abs(hitPoint.x - blockX) < epsilon) {
             return 2;
         } else if (Math.abs(hitPoint.x - (blockX + 1)) < epsilon) {
@@ -240,6 +241,7 @@ public class WorldProvider {
 
     public void update() {
         world.update();
+
         checkLookingAtBlock();
     }
 
@@ -474,7 +476,7 @@ public class WorldProvider {
             lookAtMatrix.identity();
             lookAtMatrix.translate(x, y, z);
             ShaderManager.getSelf().getLookAtBlockShader().bind();
-            ShaderManager.getSelf().getChunkShader().setUniform("worldPosMat", lookAtMatrix);
+            ShaderManager.getSelf().getLookAtBlockShader().setUniform("worldPosMat", lookAtMatrix);
             ShaderManager.getSelf().getLookAtBlockShader().unBind();
             lookingAtBlockCords.set(x, y, z);
             lookingAtBlockID = id;
