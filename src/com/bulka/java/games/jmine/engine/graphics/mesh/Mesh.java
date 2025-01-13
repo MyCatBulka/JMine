@@ -69,6 +69,14 @@ public class Mesh {
         return bufferID;
     }
 
+    public void destroy(){
+        GL15.glDeleteBuffers(pbo);
+        GL15.glDeleteBuffers(ibo);
+        GL15.glDeleteBuffers(tbo);
+
+        GL30.glDeleteVertexArrays(vao);
+    }
+
     public int[] getIndices() {
         return indices;
     }
@@ -91,14 +99,6 @@ public class Mesh {
 
     public int getTBO() {
         return tbo;
-    }
-
-    public void destroy(){
-        GL15.glDeleteBuffers(pbo);
-        GL15.glDeleteBuffers(ibo);
-        GL15.glDeleteBuffers(tbo);
-
-        GL30.glDeleteVertexArrays(vao);
     }
 
     public void setVertices(Vertex[] vertices) {

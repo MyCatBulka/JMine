@@ -10,9 +10,7 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.glfw.GLFWWindowSizeCallback;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.*;
 
 import java.awt.*;
 import java.util.logging.Logger;
@@ -69,7 +67,6 @@ public class Window {
         originalWidth = width;
         originalHeight = height;
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
-//        GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, 4);
         window = GLFW.glfwCreateWindow(width, height, title, 0, 0);
         if (window == 0) {
             logger.severe("Can`t create window!!! Terminating start");
@@ -89,6 +86,9 @@ public class Window {
                 isResized = true;
             }
         });
+        GL43.glDebugMessageCallback((source, type, id, severity, length, message, userParam) -> {
+            System.err.println("OpenGL Debug: " + GLDebugMessageCallback.getMessage(length, message));
+        }, 0);
 
     }
 

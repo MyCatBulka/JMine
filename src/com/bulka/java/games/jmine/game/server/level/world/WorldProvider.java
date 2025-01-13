@@ -90,67 +90,71 @@ public class WorldProvider {
         }
     }
 
-        public void moveChunks(int offsetX, int offsetZ) {
-            if (offsetX == 0 && offsetZ == 0) {
-                return;
-            }
-
-            int renderDistance = world.getRenderDistance();
-            Chunk[][] newChunks = new Chunk[renderDistance][renderDistance];
-
-            for (int x = 0; x < renderDistance; x++) {
-                for (int z = 0; z < renderDistance; z++) {
-                    int newX = x - offsetX;
-                    int newZ = z - offsetZ;
-
-                    if (newX >= 0 && newX < renderDistance && newZ >= 0 && newZ < renderDistance) {
-                        newChunks[newX][newZ] = world.chunks[x][z];
-                        newChunks[newX][newZ].setChunkX(newX - renderDistance / 2);
-                        newChunks[newX][newZ].setChunkZ(newZ - renderDistance / 2);
-                        newChunks[newX][newZ].updateMatrices();
-                    }
-                }
-            }
-
-            for (int x = 0; x < renderDistance; x++) {
-                for (int z = 0; z < renderDistance; z++) {
-                    if (newChunks[x][z] == null) {
-                        int chunkWorldX = x - renderDistance / 2;
-                        int chunkWorldZ = z - renderDistance / 2;
-
-                        Chunk newChunk = new Chunk(chunkWorldX, chunkWorldZ, world);
-                        newChunk.create();
-                        generateChunk(newChunk);
-                        newChunks[x][z] = newChunk;
-                        newChunk.setNeedUpdateMeshes(true);
-
-                        Chunk neighChunk;
-                        if(x != 0) {
-                            neighChunk = newChunks[x - 1][z];
-                            if (neighChunk != null)
-                                neighChunk.setNeedUpdateMeshes(true);
-                        }
-                        if(x != renderDistance -1) {
-                            neighChunk = newChunks[x + 1][z];
-                            if (neighChunk != null)
-                                neighChunk.setNeedUpdateMeshes(true);
-                        }
-                        if(z != 0) {
-                            neighChunk = newChunks[x][z - 1];
-                            if (neighChunk != null)
-                                neighChunk.setNeedUpdateMeshes(true);
-                        }
-                        if(z != renderDistance -1) {
-                            neighChunk = newChunks[x][z+1];
-                            if(neighChunk != null)
-                                neighChunk.setNeedUpdateMeshes(true);
-                        }
-                    }
-                }
-            }
-
-            world.chunks = newChunks;
+    public void moveChunks(int offsetX, int offsetZ) {
+        if (offsetX == 0 && offsetZ == 0) {
+            return;
         }
+
+        int renderDistance = world.getRenderDistance();
+        Chunk[][] newChunks = new Chunk[renderDistance][renderDistance];
+
+        for (int x = 0; x < renderDistance; x++) {
+            for (int z = 0; z < renderDistance; z++) {
+                int newX = x - offsetX;
+                int newZ = z - offsetZ;
+
+                if (newX >= 0 && newX < renderDistance && newZ >= 0 && newZ < renderDistance) {
+                    newChunks[newX][newZ] = world.chunks[x][z];
+                    newChunks[newX][newZ].setChunkX(newX - renderDistance / 2);
+                    newChunks[newX][newZ].setChunkZ(newZ - renderDistance / 2);
+                    newChunks[newX][newZ].updateMatrices();
+                } else {
+                    if(world.getChunks()[x][z] != null) {
+                        world.getChunks()[x][z].destroy();
+                    }
+                }
+            }
+        }
+
+        for (int x = 0; x < renderDistance; x++) {
+            for (int z = 0; z < renderDistance; z++) {
+                if (newChunks[x][z] == null) {
+                    int chunkWorldX = x - renderDistance / 2;
+                    int chunkWorldZ = z - renderDistance / 2;
+
+                    Chunk newChunk = new Chunk(chunkWorldX, chunkWorldZ, world);
+                    newChunk.create();
+                    generateChunk(newChunk);
+                    newChunks[x][z] = newChunk;
+                    newChunk.setNeedUpdateMeshes(true);
+
+                    Chunk neighChunk;
+                    if(x != 0) {
+                        neighChunk = newChunks[x - 1][z];
+                        if (neighChunk != null)
+                            neighChunk.setNeedUpdateMeshes(true);
+                    }
+                    if(x != renderDistance -1) {
+                        neighChunk = newChunks[x + 1][z];
+                        if (neighChunk != null)
+                            neighChunk.setNeedUpdateMeshes(true);
+                    }
+                    if(z != 0) {
+                        neighChunk = newChunks[x][z - 1];
+                        if (neighChunk != null)
+                            neighChunk.setNeedUpdateMeshes(true);
+                    }
+                    if(z != renderDistance -1) {
+                        neighChunk = newChunks[x][z+1];
+                        if(neighChunk != null)
+                            neighChunk.setNeedUpdateMeshes(true);
+                    }
+                }
+            }
+        }
+
+        world.chunks = newChunks;
+    }
 
 
     public void update() {

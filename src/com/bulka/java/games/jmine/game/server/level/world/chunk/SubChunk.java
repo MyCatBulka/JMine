@@ -170,10 +170,14 @@ public class SubChunk {
             isEmpty = true;
         } else {
             isEmpty = false;
-            mesh.destroy();
-            mesh = new ChunkMesh(vertices.toArray(new ChunkVertex[0]), indices.stream().mapToInt(i -> i).toArray());
-            mesh.create();
+//            mesh = new ChunkMesh(vertices.toArray(new ChunkVertex[0]), indices.stream().mapToInt(i -> i).toArray());
+//            mesh.destroy();
+            mesh.setVertices(vertices.toArray(new ChunkVertex[0]));
+            mesh.setIndices(indices.stream().mapToInt(i -> i).toArray());
+            mesh.recreate();
         }
+        vertices.clear();
+        indices.clear();
     }
 
     public void render() {
@@ -201,7 +205,7 @@ public class SubChunk {
     }
 
     public void destroy() {
-
+        mesh.destroy();
     }
 
     public short getBlock(int x, int y, int z) {
